@@ -1,0 +1,3 @@
+/etc/netifyd/@PACKAGE_TARNAME@.json
+/etc/netifyd/plugins.d/10-@PACKAGE_TARNAME@.conf
+/usr/lib/*/*so*

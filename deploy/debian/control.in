@@ -1,0 +1,11 @@
+Source: @PACKAGE_TARNAME@
+Section: net
+Priority: optional
+Maintainer: Darryl Sokoloski <darryl@egloo.ca>
+Build-Depends: debhelper (>= 9), autoconf, automake, bc, build-essential, libtool, libpcap-dev, libtcmalloc-minimal4, netifyd-dev (>= @NETIFY_MINVER@)
+
+Package: @PACKAGE_TARNAME@
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, netifyd (>= @NETIFY_MINVER@)
+Description: Netify Legacy Processor
+ This plugin provides template processor integration with the Netify DPI engine.

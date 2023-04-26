@@ -1,0 +1,117 @@
+# -------------------------------------------------------------------------
+# Definitions
+# -------------------------------------------------------------------------
+
+stages:
+  - build
+
+# Incude templates
+include:
+  - '/.gitlab-ci/build-templates.yml'
+
+variables:
+  NETIFY_MINVER: "4.5.0-1"
+
+# -------------------------------------------------------------------------
+# Build stage
+# -------------------------------------------------------------------------
+
+# Debian OS Targets
+#------------------
+
+debian 9 build:
+  extends: .debian_build
+  tags:
+    - docker
+  variables:
+    OS_IMAGE: "debian:9"
+    OS_NAME: "debian"
+    OS_VERSION: "9.0"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH: "amd64"
+  before_script:
+    echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list
+
+debian 10 build:
+  extends: .debian_build
+  tags:
+    - docker
+  variables:
+    OS_IMAGE: "debian:10"
+    OS_NAME: "debian"
+    OS_VERSION: "10"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH: "amd64"
+
+debian 11 build:
+  extends: .debian_build
+  tags:
+    - docker
+  variables:
+    OS_IMAGE: "debian:11"
+    OS_NAME: "debian"
+    OS_VERSION: "11"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH: "amd64"
+
+# Ubuntu OS Targets
+#------------------
+
+ubuntu 18.04 build:
+  extends: .debian_build
+  tags:
+    - docker
+  variables:
+    OS_IMAGE: "ubuntu:18.04"
+    OS_NAME: "ubuntu"
+    OS_VERSION: "bionic"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH: "binary-amd64"
+
+ubuntu 20.04 build:
+  extends: .debian_build
+  tags:
+    - docker
+  variables:
+    OS_IMAGE: "ubuntu:20.04"
+    OS_NAME: "ubuntu"
+    OS_VERSION: "focal"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH: "binary-amd64"
+
+ubuntu 22.04 build:
+  extends: .debian_build
+  tags:
+    - docker
+  variables:
+    OS_IMAGE: "ubuntu:22.04"
+    OS_NAME: "ubuntu"
+    OS_VERSION: "jammy"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH: "binary-amd64"
+
+# RPM OS Targets
+#---------------
+
+centos 7 build:
+  extends: .rpmos_build
+  tags:
+    - docker
+  variables:
+    RPMOS_IMAGE: "centos:7.9.2009"
+    RPMOS_OS: "centos"
+    RPMOS_VERSION: "7"
+    RPMOS_ARCH: "x86_64"
+    RPMOS_REPOS: ""
+
+almalinux 8 build:
+  extends: .rpmos_build
+  tags:
+    - docker
+  variables:
+    RPMOS_IMAGE: "almalinux:8"
+    RPMOS_OS: "almalinux"
+    RPMOS_VERSION: "8"
+    RPMOS_ARCH: "x86_64"
+    RPMOS_REPOS: "--enablerepo=powertools"
+

@@ -1,0 +1,6 @@
+Makefile
+Makefile.in
+debian.changelog
+debian.control
+debian.rules
+netify-proc-legacy.install

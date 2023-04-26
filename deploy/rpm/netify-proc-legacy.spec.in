@@ -1,0 +1,60 @@
+# Netify Agent Legacy Processor
+
+Name: @PACKAGE_TARNAME@
+Version: @PACKAGE_VERSION@
+Release: 1%{dist}
+License: Proprietary
+Group: System/Plugins
+Vendor: eGloo Incorporated
+Packager: eGloo Incorporated
+Source: %{name}-%{version}.tar.gz
+BuildRoot: /var/tmp/%{name}-%{version}
+Requires: netifyd >= @NETIFY_MINVER@
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
+BuildRequires: netifyd-devel >= @NETIFY_MINVER@
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libpcap-devel
+BuildRequires: libtool
+Summary: Legacy Processor Plugin for the Netify Agent DPI Engine
+
+%description
+This is a aggregated flow statistics plugin for the Netify Agent DPI Engine.
+
+Report bugs to: @PACKAGE_BUGREPORT@
+
+# Build
+%prep
+%setup -q
+./autogen.sh
+%{configure}
+
+%build
+make %{?_smp_mflags}
+
+# Install
+%install
+make install DESTDIR=$RPM_BUILD_ROOT
+rm -f ${RPM_BUILD_ROOT}/%{_libdir}/lib*.a
+rm -f ${RPM_BUILD_ROOT}/%{_libdir}/lib*.la
+
+# Clean-up
+%clean
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+
+# Post install
+%post
+/sbin/ldconfig
+
+# Post uninstall
+%postun
+/sbin/ldconfig
+
+# Files
+%files
+%defattr(-,root,root)
+%{_libdir}/lib*.so*
+%config(noreplace) /etc/netifyd/@PACKAGE_TARNAME@.json
+%config(noreplace) /etc/netifyd/plugins.d/10-@PACKAGE_TARNAME@.conf
+

@@ -1,0 +1,9 @@
+{
+    "log_interval": 60,
+    "privacy_mode": false,
+    "sinks": {
+        "sink-log": [
+            "default"
+        ]
+    }
+}
