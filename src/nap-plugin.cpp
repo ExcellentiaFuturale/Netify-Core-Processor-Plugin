@@ -186,7 +186,7 @@ void napLegacy::DispatchProcessorEvent(
     const string &iface, ndPacketStats *stats)
 {
     switch (event) {
-    case ndPluginProcessor::EVENT_PKG_CAPTURE_STATS:
+    case ndPluginProcessor::EVENT_PKT_CAPTURE_STATS:
         break;
     default:
         break;
@@ -197,7 +197,7 @@ void napLegacy::DispatchProcessorEvent(
     ndPluginProcessor::Event event, ndPacketStats *stats)
 {
     switch (event) {
-    case ndPluginProcessor::EVENT_PKG_GLOBAL_STATS:
+    case ndPluginProcessor::EVENT_PKT_GLOBAL_STATS:
         break;
     default:
         break;
