@@ -1,14 +1,25 @@
 // Netify Agent Legacy Processor
 // Copyright (C) 2021-2022 eGloo Incorporated <http://www.egloo.ca>
 
-#ifndef _NAP_PLUGIN_H
-#define _NAP_PLUGIN_H
+#ifndef _NPP_PLUGIN_H
+#define _NPP_PLUGIN_H
 
-class napLegacy : public ndPluginProcessor
+class nppFlowEvent
 {
 public:
-    napLegacy(const string &tag, const ndPlugin::Params &params);
-    virtual ~napLegacy();
+    nppFlowEvent(ndPluginProcessor::Event event, nd_flow_ptr& flow)
+        : flow(flow), event(event) {
+    }
+
+    nd_flow_ptr flow;
+    ndPluginProcessor::Event event;
+};
+
+class nppLegacy : public ndPluginProcessor
+{
+public:
+    nppLegacy(const string &tag, const ndPlugin::Params &params);
+    virtual ~nppLegacy();
 
     virtual void *Entry(void);
 
@@ -27,7 +38,7 @@ public:
     virtual void DispatchProcessorEvent(
         ndPluginProcessor::Event event, ndFlowMap *flow_map);
     virtual void DispatchProcessorEvent(
-        ndPluginProcessor::Event event, ndFlow *flow);
+        ndPluginProcessor::Event event, nd_flow_ptr& flow);
     virtual void DispatchProcessorEvent(
         ndPluginProcessor::Event event, ndInterfaces *interfaces);
     virtual void DispatchProcessorEvent(
@@ -44,7 +55,18 @@ protected:
     atomic<bool> reload;
 
     void Reload(void);
+
+    pthread_cond_t lock_cond;
+    pthread_mutex_t cond_mutex;
+
+    map<string, ndPlugin::Channels> sinks_http;
+    map<string, ndPlugin::Channels> sinks_socket;
+
+    vector<nppFlowEvent> flow_events;
+    vector<nppFlowEvent> flow_events_priv;
+
+    void EncodeFlow(const nppFlowEvent &event);
 };
 
-#endif // _NAP_PLUGIN_H
+#endif // _NPP_PLUGIN_H
 // vi: expandtab shiftwidth=4 softtabstop=4 tabstop=4
