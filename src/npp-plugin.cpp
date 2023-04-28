@@ -176,16 +176,6 @@ void *nppLegacy::Entry(void)
         }
     }
 
-    Lock();
-
-    // XXX: Ensure we release any held flow tickets...
-    nd_dprintf("%s: clearing %lu flow events...\n", tag.c_str(),
-        flow_events.size());
-
-    flow_events.clear();
-
-    Unlock();
-
     return NULL;
 }
 
@@ -417,8 +407,10 @@ void nppLegacy::EncodeFlow(const nppFlowEvent &event)
 
     for (auto &sink : sinks_http)
         DispatchSinkPayload(sink.first, sink.second, jflow);
-    for (auto &sink : sinks_socket)
-        DispatchSinkPayload(sink.first, sink.second, jflow);
+    for (auto &sink : sinks_socket) {
+        DispatchSinkPayload(sink.first, sink.second,
+            jflow, ndPluginProcessor::DF_ADD_HEADER);
+    }
 }
 
 ndPluginInit(nppLegacy);
