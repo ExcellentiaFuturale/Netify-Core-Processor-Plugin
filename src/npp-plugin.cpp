@@ -80,13 +80,13 @@ using namespace std;
 #include <nd-protos.h>
 #include <nd-category.h>
 #include <nd-flow.h>
-#include <nd-flow-parser.h>
 #include <nd-flow-map.h>
 #include <nd-dhc.h>
 #include <nd-fhc.h>
 class ndInstanceStatus;
 #include <nd-plugin.h>
 #include <nd-instance.h>
+#include <nd-flow-parser.h>
 
 #include "npp-plugin.h"
 
@@ -398,10 +398,10 @@ void nppLegacy::EncodeFlow(const nppFlowEvent &event)
     if (event.event == ndPluginProcessor::EVENT_FLOW_MAP) {
         string flow;
         nd_json_to_string(jflow, flow, ndGC_DEBUG);
-
+#if 0
         nd_dprintf("%s: %s: %lu bytes\n",
             tag.c_str(), __PRETTY_FUNCTION__, flow.size());
-
+#endif
         return;
     }
 
