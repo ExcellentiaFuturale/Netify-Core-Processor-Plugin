@@ -8,10 +8,9 @@
     # Build environment
     - apt update
     - env DEBIAN_FRONTEND=noninteractive apt install -y rsync debhelper autoconf automake bc build-essential libtool wget pkg-config git
-    - env DEBIAN_FRONTEND=noninteractive apt install -y libpcap-dev libtcmalloc-minimal4
     - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH_PATH/netifyd_${NETIFY_MINVER}_${OS_ARCH}.deb
     - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH_PATH/netifyd-dev_${NETIFY_MINVER}_${OS_ARCH}.deb
-    - apt install -y ./netifyd_${NETIFY_MINVER}_${OS_ARCH}.deb ./netifyd-dev_${NETIFY_MINVER}_${OS_ARCH}.deb
+    - env DEBIAN_FRONTEND=noninteractive apt install -y ./netifyd_${NETIFY_MINVER}_${OS_ARCH}.deb ./netifyd-dev_${NETIFY_MINVER}_${OS_ARCH}.deb
     # Build packages
     - ./autogen.sh
     - ./configure --prefix=/usr --includedir=\${prefix}/include --mandir=\${prefix}/share/man --sysconfdir=/etc --localstatedir=/var
@@ -40,7 +39,7 @@
   script:
     # Build environment
     - yum -y install make rpm-build which expect yum-utils sudo autoconf gcc gcc-c++ automake libtool rsync bc git wget
-    - yum -y install $RPMOS_REPOS libpcap-devel
+    - yum -y install $RPMOS_REPOS
     - wget --no-check-certificate https://download.netify.ai/netify/$RPMOS_OS/$RPMOS_VERSION/devel/$RPMOS_ARCH/netifyd-${NETIFY_MINVER}.os${RPMOS_VERSION}.x86_64.rpm
     - wget --no-check-certificate https://download.netify.ai/netify/$RPMOS_OS/$RPMOS_VERSION/devel/$RPMOS_ARCH/netifyd-devel-${NETIFY_MINVER}.os${RPMOS_VERSION}.x86_64.rpm
     - yum -y localinstall $RPMOS_REPOS netifyd*.rpm
