@@ -30,7 +30,8 @@ debian 9 build:
     OS_ARCH: "amd64"
     OS_ARCH_PATH: "amd64"
   before_script:
-    echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list
+    - echo "deb http://archive.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list
+    - echo "deb http://archive.debian.org/debian-security stretch/updates main contrib non-free" >> /etc/apt/sources.list
 
 debian 10 build:
   extends: .debian_build
