@@ -119,8 +119,8 @@ nppLegacy::~nppLegacy()
 {
     int rc;
     if ((rc = pthread_cond_broadcast(&lock_cond)) != 0) {
-        throw ndPluginException(
-            "pthread_cond_broadcast", strerror(rc)
+        nd_dprintf("%s: pthread_cond_broadcast: %s\n",
+            tag.c_str(), strerror(errno)
         );
     }
 
