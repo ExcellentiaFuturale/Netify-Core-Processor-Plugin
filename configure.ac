@@ -44,7 +44,6 @@ AS_IF([test "x$ac_volatilestatedir" = "x"],
 )
 
 # Checks for header files.
-AC_CHECK_HEADERS([pcap/pcap.h], [], AC_MSG_ERROR([required header(s) not found.]))
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
