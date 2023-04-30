@@ -420,7 +420,8 @@ void nppLegacy::EncodeFlow(const nppFlowEvent &event)
 
     for (auto &sink : sinks_socket) {
         DispatchSinkPayload(sink.first, sink.second,
-            jflow, ndPluginProcessor::DF_ADD_HEADER);
+            jflow, ndPlugin::DF_ADD_HEADER
+        );
     }
 }
 
@@ -478,8 +479,11 @@ void nppLegacy::DispatchPostPayload(void)
     jpost["stats"] = jpost_iface_stats;
     jpost_iface_stats.clear();
 
-    for (auto &sink : sinks_http)
-        DispatchSinkPayload(sink.first, sink.second, jpost);
+    for (auto &sink : sinks_http) {
+        DispatchSinkPayload(sink.first, sink.second,
+            jpost, ndPlugin::DF_GZ_DEFLATE
+        );
+    }
 
     jpost.clear();
 }
