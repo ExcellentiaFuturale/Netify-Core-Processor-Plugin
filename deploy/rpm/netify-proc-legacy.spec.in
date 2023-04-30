@@ -15,7 +15,6 @@ Requires(postun): /sbin/ldconfig
 BuildRequires: netifyd-devel >= @NETIFY_MINVER@
 BuildRequires: autoconf
 BuildRequires: automake
-BuildRequires: libpcap-devel
 BuildRequires: libtool
 Summary: Legacy Processor Plugin for the Netify Agent DPI Engine
 
