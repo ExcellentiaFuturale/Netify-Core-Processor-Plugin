@@ -4,6 +4,8 @@
 #ifndef _NPP_PLUGIN_H
 #define _NPP_PLUGIN_H
 
+#define _NPP_LEGACY_JSON_VERSION    1.9
+
 class nppFlowEvent
 {
 public:
@@ -53,6 +55,7 @@ public:
 
 protected:
     atomic<bool> reload;
+    atomic<bool> http_post;
 
     void Reload(void);
 
@@ -66,6 +69,19 @@ protected:
     vector<nppFlowEvent> flow_events_priv;
 
     void EncodeFlow(const nppFlowEvent &event);
+
+    json jpost;
+    map<string, vector<json>> jpost_flows;
+    json jpost_ifaces;
+    json jpost_iface_endpoints;
+    json jpost_iface_stats;
+
+    void EncodeAgentStatus(ndInstanceStatus *status);
+    void EncodeInterfaces(ndInterfaces *interfaces);
+    void EncodeInterfaceStats(
+        const string &iface, ndPacketStats *stats);
+
+    void DispatchPostPayload(void);
 };
 
 #endif // _NPP_PLUGIN_H

@@ -96,6 +96,7 @@ nppLegacy::nppLegacy(
         throw ndPluginException("conf_filename", strerror(EINVAL));
 
     reload = true;
+    http_post = false;
 
     int rc;
     pthread_condattr_t cond_attr;
@@ -144,6 +145,11 @@ void *nppLegacy::Entry(void)
         if (reload.load()) {
             Reload();
             reload = false;
+        }
+
+        if (http_post.load()) {
+            DispatchPostPayload();
+            http_post = false;
         }
 
         Lock();
@@ -270,6 +276,7 @@ void nppLegacy::DispatchProcessorEvent(
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
     switch (event) {
     case ndPluginProcessor::EVENT_INTERFACES:
+        EncodeInterfaces(interfaces);
         break;
     default:
         break;
@@ -283,6 +290,7 @@ void nppLegacy::DispatchProcessorEvent(
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
     switch (event) {
     case ndPluginProcessor::EVENT_PKT_CAPTURE_STATS:
+        EncodeInterfaceStats(iface, stats);
         break;
     default:
         break;
@@ -307,6 +315,7 @@ void nppLegacy::DispatchProcessorEvent(
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
     switch (event) {
     case ndPluginProcessor::EVENT_UPDATE_INIT:
+        EncodeAgentStatus(status);
         break;
     default:
         break;
@@ -319,6 +328,7 @@ void nppLegacy::DispatchProcessorEvent(
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
     switch (event) {
     case ndPluginProcessor::EVENT_UPDATE_COMPLETE:
+        http_post = true;
         break;
     default:
         break;
@@ -394,21 +404,84 @@ void nppLegacy::EncodeFlow(const nppFlowEvent &event)
     event.flow->Encode(jflow, encode_options);
 
     if (event.event == ndPluginProcessor::EVENT_FLOW_MAP) {
-        string flow;
-        nd_json_to_string(jflow, flow, ndGC_DEBUG);
-#if 0
-        nd_dprintf("%s: %s: %lu bytes\n",
-            tag.c_str(), __PRETTY_FUNCTION__, flow.size());
-#endif
+        string iface_name;
+        nd_iface_name(event.flow->iface.ifname, iface_name);
+
+        auto it = jpost_flows.find(iface_name);
+        if (it != jpost_flows.end())
+            it->second.push_back(jflow);
+        else {
+            vector<json> jf = { jflow };
+            jpost_flows.insert(make_pair(iface_name, jf));
+        }
+
         return;
     }
 
-    for (auto &sink : sinks_http)
-        DispatchSinkPayload(sink.first, sink.second, jflow);
     for (auto &sink : sinks_socket) {
         DispatchSinkPayload(sink.first, sink.second,
             jflow, ndPluginProcessor::DF_ADD_HEADER);
     }
+}
+
+void nppLegacy::EncodeAgentStatus(ndInstanceStatus *status)
+{
+    jpost.clear();
+    jpost["version"] = _NPP_LEGACY_JSON_VERSION;
+
+    status->Encode(jpost);
+}
+
+void nppLegacy::EncodeInterfaces(ndInterfaces *interfaces)
+{
+    static const vector<string> keys = { "addr" };
+
+    for (auto &i : *interfaces) {
+        json jo;
+        i.second.Encode(jo);
+        i.second.EncodeAddrs(jo, keys);
+
+        string iface_name;
+        nd_iface_name(i.second.ifname, iface_name);
+
+        jpost_ifaces[iface_name] = jo;
+
+        i.second.EncodeEndpoints(
+            i.second.LastEndpointSnapshot(), jpost_iface_endpoints
+        );
+    }
+}
+
+void nppLegacy::EncodeInterfaceStats(
+    const string &iface, ndPacketStats *stats)
+{
+    string iface_name;
+    nd_iface_name(iface, iface_name);
+
+    json jo;
+    stats->Encode(jo);
+
+    jpost_iface_stats[iface_name] = jo;
+}
+
+void nppLegacy::DispatchPostPayload(void)
+{
+    jpost["flows"] = jpost_flows;
+    jpost_flows.clear();
+
+    jpost["interfaces"] = jpost_ifaces;
+    jpost_ifaces.clear();
+
+    jpost["devices"] = jpost_iface_endpoints;
+    jpost_iface_endpoints.clear();
+
+    jpost["stats"] = jpost_iface_stats;
+    jpost_iface_stats.clear();
+
+    for (auto &sink : sinks_http)
+        DispatchSinkPayload(sink.first, sink.second, jpost);
+
+    jpost.clear();
 }
 
 ndPluginInit(nppLegacy);
