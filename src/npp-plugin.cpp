@@ -88,7 +88,44 @@ class ndInstanceStatus;
 
 #include "npp-plugin.h"
 
-nppLegacy::nppLegacy(
+void nppChannelConfig::Load(
+    const string &channel, const json &jconf)
+{
+    auto it = jconf.find("type");
+    if (it != jconf.end() && it->type() == json::value_t::string) {
+        string type = it->get<string>();
+        if (type == "legacy-http")
+            this->type = nppChannelConfig::TYPE_LEGACY_HTTP;
+        else if (type == "legacy-socket")
+            this->type = nppChannelConfig::TYPE_LEGACY_SOCKET;
+        else
+            throw ndPluginException("type", strerror(EINVAL));
+    }
+
+    it = jconf.find("format");
+    if (it != jconf.end() && it->type() == json::value_t::string) {
+        string format = it->get<string>();
+        if (format == "json")
+            this->format = nppChannelConfig::FORMAT_JSON;
+        else if (format == "msgpack")
+            this->format = nppChannelConfig::FORMAT_MSGPACK;
+        else
+            throw ndPluginException("format", strerror(EINVAL));
+    }
+
+    it = jconf.find("compressor");
+    if (it != jconf.end() && it->type() == json::value_t::string) {
+        string compressor = it->get<string>();
+        if (compressor == "none")
+            this->compressor = nppChannelConfig::COMPRESSOR_NONE;
+        else if (compressor == "gz")
+            this->compressor = nppChannelConfig::COMPRESSOR_GZ;
+        else
+            throw ndPluginException("compressor", strerror(EINVAL));
+    }
+}
+
+nppPlugin::nppPlugin(
     const string &tag, const ndPlugin::Params &params)
     : ndPluginProcessor(tag, params)
 {
@@ -114,7 +151,7 @@ nppLegacy::nppLegacy(
     nd_dprintf("%s: initialized\n", tag.c_str());
 }
 
-nppLegacy::~nppLegacy()
+nppPlugin::~nppPlugin()
 {
     int rc;
     if ((rc = pthread_cond_broadcast(&lock_cond)) != 0) {
@@ -131,7 +168,7 @@ nppLegacy::~nppLegacy()
     nd_dprintf("%s: destroyed\n", tag.c_str());
 }
 
-void *nppLegacy::Entry(void)
+void *nppPlugin::Entry(void)
 {
     int rc;
 
@@ -183,7 +220,7 @@ void *nppLegacy::Entry(void)
     return NULL;
 }
 
-void nppLegacy::DispatchEvent(ndPlugin::Event event, void *param)
+void nppPlugin::DispatchEvent(ndPlugin::Event event, void *param)
 {
     switch (event) {
     case ndPlugin::EVENT_RELOAD:
@@ -194,7 +231,7 @@ void nppLegacy::DispatchEvent(ndPlugin::Event event, void *param)
     }
 }
 
-void nppLegacy::DispatchProcessorEvent(
+void nppPlugin::DispatchProcessorEvent(
     ndPluginProcessor::Event event, ndFlowMap *flow_map)
 {
     switch (event) {
@@ -238,7 +275,7 @@ void nppLegacy::DispatchProcessorEvent(
     }
 }
 
-void nppLegacy::DispatchProcessorEvent(
+void nppPlugin::DispatchProcessorEvent(
     ndPluginProcessor::Event event, nd_flow_ptr& flow)
 {
 #if 0
@@ -270,7 +307,7 @@ void nppLegacy::DispatchProcessorEvent(
     }
 }
 
-void nppLegacy::DispatchProcessorEvent(
+void nppPlugin::DispatchProcessorEvent(
     ndPluginProcessor::Event event, ndInterfaces *interfaces)
 {
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
@@ -283,7 +320,7 @@ void nppLegacy::DispatchProcessorEvent(
     }
 }
 
-void nppLegacy::DispatchProcessorEvent(
+void nppPlugin::DispatchProcessorEvent(
     ndPluginProcessor::Event event,
     const string &iface, ndPacketStats *stats)
 {
@@ -297,7 +334,7 @@ void nppLegacy::DispatchProcessorEvent(
     }
 }
 
-void nppLegacy::DispatchProcessorEvent(
+void nppPlugin::DispatchProcessorEvent(
     ndPluginProcessor::Event event, ndPacketStats *stats)
 {
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
@@ -309,7 +346,7 @@ void nppLegacy::DispatchProcessorEvent(
     }
 }
 
-void nppLegacy::DispatchProcessorEvent(
+void nppPlugin::DispatchProcessorEvent(
     ndPluginProcessor::Event event, ndInstanceStatus *status)
 {
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
@@ -322,7 +359,7 @@ void nppLegacy::DispatchProcessorEvent(
     }
 }
 
-void nppLegacy::DispatchProcessorEvent(
+void nppPlugin::DispatchProcessorEvent(
     ndPluginProcessor::Event event)
 {
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
@@ -335,7 +372,7 @@ void nppLegacy::DispatchProcessorEvent(
     }
 }
 
-void nppLegacy::Reload(void)
+void nppPlugin::Reload(void)
 {
     nd_dprintf("%s: Loading configuration: %s\n",
         tag.c_str(), conf_filename.c_str()
@@ -346,7 +383,6 @@ void nppLegacy::Reload(void)
     if (! ifs.is_open()) {
         nd_printf("%s: Error loading configuration: %s: %s\n",
             tag.c_str(), conf_filename.c_str(), strerror(ENOENT));
-        Unlock();
         throw ndPluginException("conf_filename", strerror(ENOENT));
     }
 
@@ -357,25 +393,102 @@ void nppLegacy::Reload(void)
         nd_printf("%s: Error loading configuration: %s: JSON parse error\n",
             tag.c_str(), conf_filename.c_str());
         nd_dprintf("%s: %s: %s\n", tag.c_str(), conf_filename.c_str(), e.what());
-        Unlock();
         throw ndPluginException("conf_filename", strerror(EINVAL));
     }
 
+    defaults.Load("defaults", j);
+
+    Lock();
+
+    sinks.clear();
+
     try {
-        sinks_http.clear();
-        sinks_socket.clear();
-        for (auto &kvp : j["sinks_http"].get<json::object_t>()) {
-            if (kvp.second.type() != json::value_t::array) continue;
-            sinks_http[kvp.first] = kvp.second.get<ndPlugin::Channels>();
+        auto jsinks = j.find("sinks");
+
+        if (jsinks != j.end()) {
+
+            for (auto &jsink : jsinks->get<json::object_t>()) {
+
+                for (auto &jchannel :
+                    jsink.second.get<json::object_t>()) {
+
+                    auto it = jchannel.second.find("enable");
+                    if (it != jchannel.second.end() &&
+                        it->type() == json::value_t::boolean &&
+                        it->get<bool>() != true) continue;
+
+                    nppChannelConfig config;
+
+                    config.Load(
+                        jchannel.first, jchannel.second, defaults
+                    );
+
+                    auto sink = sinks.find(jsink.first);
+                    if (sink == sinks.end()) {
+                        map<string, nppChannelConfig> entry;
+
+                        entry.insert(
+                            make_pair(jchannel.first, config)
+                        );
+                        sinks.insert(
+                            make_pair(jsink.first, entry)
+                        );
+                    }
+                    else {
+                        sink->second.insert(
+                            make_pair(jchannel.first, config)
+                        );
+                    }
+                }
+            }
         }
-        for (auto &kvp : j["sinks_socket"].get<json::object_t>()) {
-            if (kvp.second.type() != json::value_t::array) continue;
-            sinks_socket[kvp.first] = kvp.second.get<ndPlugin::Channels>();
-        }
-    } catch (...) { }
+    }
+    catch (exception &e) {
+        Unlock();
+        throw e;
+    }
+
+    Unlock();
 }
 
-void nppLegacy::EncodeFlow(const nppFlowEvent &event)
+void nppPlugin::DispatchSinkPayload(
+    nppChannelConfig::Type type, const json &jpayload)
+{
+    for (auto &sink : sinks) {
+
+        for (auto &channel : sink.second) {
+
+            if (channel.second.type != type) continue;
+
+            uint8_t flags = ndPlugin::DF_ADD_HEADER;
+
+            switch (channel.second.format) {
+            case nppChannelConfig::FORMAT_JSON:
+                flags |= ndPlugin::DF_FORMAT_JSON;
+                break;
+            case nppChannelConfig::FORMAT_MSGPACK:
+                flags |= ndPlugin::DF_FORMAT_MSGPACK;
+                break;
+            default:
+                break;
+            }
+
+            switch (channel.second.compressor) {
+            case nppChannelConfig::COMPRESSOR_GZ:
+                flags |= ndPlugin::DF_GZ_DEFLATE;
+                break;
+            default:
+                break;
+            }
+
+            ndPluginProcessor::DispatchSinkPayload(
+                sink.first, { channel.first }, jpayload, flags
+            );
+        }
+    }
+}
+
+void nppPlugin::EncodeFlow(const nppFlowEvent &event)
 {
     json jflow;
 
@@ -418,14 +531,12 @@ void nppLegacy::EncodeFlow(const nppFlowEvent &event)
         return;
     }
 
-    for (auto &sink : sinks_socket) {
-        DispatchSinkPayload(sink.first, sink.second,
-            jflow, ndPlugin::DF_ADD_HEADER
-        );
-    }
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_LEGACY_SOCKET, jflow
+    );
 }
 
-void nppLegacy::EncodeAgentStatus(ndInstanceStatus *status)
+void nppPlugin::EncodeAgentStatus(ndInstanceStatus *status)
 {
     jpost.clear();
     jpost["version"] = _NPP_LEGACY_JSON_VERSION;
@@ -433,7 +544,7 @@ void nppLegacy::EncodeAgentStatus(ndInstanceStatus *status)
     status->Encode(jpost);
 }
 
-void nppLegacy::EncodeInterfaces(ndInterfaces *interfaces)
+void nppPlugin::EncodeInterfaces(ndInterfaces *interfaces)
 {
     static const vector<string> keys = { "addr" };
 
@@ -453,7 +564,7 @@ void nppLegacy::EncodeInterfaces(ndInterfaces *interfaces)
     }
 }
 
-void nppLegacy::EncodeInterfaceStats(
+void nppPlugin::EncodeInterfaceStats(
     const string &iface, ndPacketStats *stats)
 {
     string iface_name;
@@ -465,7 +576,7 @@ void nppLegacy::EncodeInterfaceStats(
     jpost_iface_stats[iface_name] = jo;
 }
 
-void nppLegacy::DispatchPostPayload(void)
+void nppPlugin::DispatchPostPayload(void)
 {
     jpost["flows"] = jpost_flows;
     jpost_flows.clear();
@@ -479,15 +590,13 @@ void nppLegacy::DispatchPostPayload(void)
     jpost["stats"] = jpost_iface_stats;
     jpost_iface_stats.clear();
 
-    for (auto &sink : sinks_http) {
-        DispatchSinkPayload(sink.first, sink.second,
-            jpost, ndPlugin::DF_GZ_DEFLATE
-        );
-    }
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_LEGACY_HTTP, jpost
+    );
 
     jpost.clear();
 }
 
-ndPluginInit(nppLegacy);
+ndPluginInit(nppPlugin);
 
 // vi: expandtab shiftwidth=4 softtabstop=4 tabstop=4

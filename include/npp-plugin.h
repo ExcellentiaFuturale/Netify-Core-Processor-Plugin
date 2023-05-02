@@ -6,6 +6,45 @@
 
 #define _NPP_LEGACY_JSON_VERSION    1.9
 
+class nppChannelConfig
+{
+public:
+    enum Type {
+        TYPE_INVALID,
+        TYPE_LEGACY_HTTP,
+        TYPE_LEGACY_SOCKET,
+    };
+
+    enum Format {
+        FORMAT_RAW,
+        FORMAT_JSON,
+        FORMAT_MSGPACK,
+    };
+
+    enum Compressor {
+        COMPRESSOR_NONE,
+        COMPRESSOR_GZ,
+    };
+
+    nppChannelConfig() :
+        type(TYPE_INVALID),
+        format(FORMAT_JSON), compressor(COMPRESSOR_NONE) { }
+
+    void Load(const string &channel, const json &jconf);
+    inline void Load(const string &channel,
+        const json &jconf, nppChannelConfig &defaults) {
+        type = defaults.type;
+        format = defaults.format;
+        compressor = defaults.compressor;
+        Load(channel, jconf);
+    }
+
+    string channel;
+    Type type;
+    Format format;
+    Compressor compressor;
+};
+
 class nppFlowEvent
 {
 public:
@@ -17,11 +56,11 @@ public:
     ndPluginProcessor::Event event;
 };
 
-class nppLegacy : public ndPluginProcessor
+class nppPlugin : public ndPluginProcessor
 {
 public:
-    nppLegacy(const string &tag, const ndPlugin::Params &params);
-    virtual ~nppLegacy();
+    nppPlugin(const string &tag, const ndPlugin::Params &params);
+    virtual ~nppPlugin();
 
     virtual void *Entry(void);
 
@@ -62,11 +101,14 @@ protected:
     pthread_cond_t lock_cond;
     pthread_mutex_t cond_mutex;
 
-    map<string, ndPlugin::Channels> sinks_http;
-    map<string, ndPlugin::Channels> sinks_socket;
+    nppChannelConfig defaults;
+    map<string, map<string, nppChannelConfig>> sinks;
 
     vector<nppFlowEvent> flow_events;
     vector<nppFlowEvent> flow_events_priv;
+
+    virtual void DispatchSinkPayload(
+        nppChannelConfig::Type type, const json &jpayload);
 
     void EncodeFlow(const nppFlowEvent &event);
 

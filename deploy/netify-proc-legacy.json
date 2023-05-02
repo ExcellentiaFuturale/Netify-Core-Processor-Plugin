@@ -1,12 +1,20 @@
 {
-    "sinks_http": {
-        "sink-legacy": [
-            "default"
-        ]
-    },
-    "sinks_socket": {
-        "sink-socket": [
-            "default"
-        ]
+    "format": "json",
+    "compressor": "none",
+    "sinks": {
+        "sink-http-legacy": {
+            "default": {
+                "enable": false,
+                "type": "legacy-http",
+                "format": "json",
+                "compressor": "gz"
+            }
+        },
+        "sink-socket": {
+            "default": {
+                "enable": true,
+                "type": "legacy-socket"
+            }
+        }
     }
 }
