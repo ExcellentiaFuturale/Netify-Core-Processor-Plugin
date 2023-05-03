@@ -460,7 +460,9 @@ void nppPlugin::DispatchSinkPayload(
 
             if (channel.second.type != type) continue;
 
-            uint8_t flags = ndPlugin::DF_ADD_HEADER;
+            uint8_t flags = (
+                type == nppChannelConfig::TYPE_LEGACY_SOCKET
+                ) ? ndPlugin::DF_ADD_HEADER : ndPlugin::DF_NONE;
 
             switch (channel.second.format) {
             case nppChannelConfig::FORMAT_JSON:
