@@ -12,7 +12,7 @@ AC_USE_SYSTEM_EXTENSIONS
 
 # Set the minimum Agent version this plugin requires.
 # When updating this version, remember to update .gitlab-ci.yml too.
-NETIFY_MINVER=4.5.5
+NETIFY_MINVER=4.5.7
 AC_SUBST([NETIFY_MINVER], [$NETIFY_MINVER])
 
 # Checks for programs.
