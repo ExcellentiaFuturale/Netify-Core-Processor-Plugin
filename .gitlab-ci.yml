@@ -10,7 +10,7 @@ include:
   - '/.gitlab-ci/build-templates.yml'
 
 variables:
-  NETIFY_MINVER: "4.5.7-1"
+  NETIFY_MINVER: "4.5.9-1"
 
 # -------------------------------------------------------------------------
 # Build stage

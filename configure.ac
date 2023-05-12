@@ -1,9 +1,7 @@
 # Netify Agent Legacy Processor Plugin
 
-AC_PREREQ([2.63])
-AC_INIT([Netify Legacy Processor Plugin], [1.0.0],
-    [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-legacy/issues],
-    [netify-proc-legacy], [http://www.netify.ai/])
+AC_PREREQ([2.69])
+AC_INIT([Netify Legacy Processor Plugin],[1.0.0],[https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-legacy/issues],[netify-proc-legacy],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
 AC_CONFIG_SRCDIR([src/npp-plugin.cpp])
 AC_CONFIG_HEADERS([config.h])
@@ -12,13 +10,13 @@ AC_USE_SYSTEM_EXTENSIONS
 
 # Set the minimum Agent version this plugin requires.
 # When updating this version, remember to update .gitlab-ci.yml too.
-NETIFY_MINVER=4.5.7
+NETIFY_MINVER=4.5.9
 AC_SUBST([NETIFY_MINVER], [$NETIFY_MINVER])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_INSTALL
-AM_PROG_LIBTOOL
+LT_INIT
 PKG_PROG_PKG_CONFIG([0.23])
 AX_PKG_INSTALLDIR
 
