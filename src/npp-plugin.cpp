@@ -519,15 +519,16 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event)
     event.flow->Encode(jflow, encode_options);
 
     if (event.event == ndPluginProcessor::EVENT_FLOW_MAP) {
-        string iface_name;
-        nd_iface_name(event.flow->iface.ifname, iface_name);
-
-        auto it = jpost_flows.find(iface_name);
+        auto it = jpost_flows.find(event.flow->iface.ifname);
         if (it != jpost_flows.end())
             it->second.push_back(jflow);
         else {
             vector<json> jf = { jflow };
-            jpost_flows.insert(make_pair(iface_name, jf));
+            jpost_flows.insert(
+                make_pair(
+                    event.flow->iface.ifname, jf
+                )
+            );
         }
 
         return;
@@ -555,10 +556,7 @@ void nppPlugin::EncodeInterfaces(ndInterfaces *interfaces)
         i.second.Encode(jo);
         i.second.EncodeAddrs(jo, keys);
 
-        string iface_name;
-        nd_iface_name(i.second.ifname, iface_name);
-
-        jpost_ifaces[iface_name] = jo;
+        jpost_ifaces[i.second.ifname] = jo;
 
         i.second.EncodeEndpoints(
             i.second.LastEndpointSnapshot(), jpost_iface_endpoints
@@ -569,13 +567,10 @@ void nppPlugin::EncodeInterfaces(ndInterfaces *interfaces)
 void nppPlugin::EncodeInterfaceStats(
     const string &iface, ndPacketStats *stats)
 {
-    string iface_name;
-    nd_iface_name(iface, iface_name);
-
     json jo;
     stats->Encode(jo);
 
-    jpost_iface_stats[iface_name] = jo;
+    jpost_iface_stats[iface] = jo;
 }
 
 void nppPlugin::DispatchPostPayload(void)
