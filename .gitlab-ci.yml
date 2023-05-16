@@ -109,9 +109,6 @@ rockylinux 8 build:
   extends: .rpmos_build
   tags:
     - docker
-  only:
-    - tags
-    - web
   variables:
     RPMOS_IMAGE: "rockylinux:8"
     RPMOS_OS: "rockylinux"
