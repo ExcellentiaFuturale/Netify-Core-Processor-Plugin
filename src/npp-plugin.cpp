@@ -518,6 +518,16 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event)
 
     event.flow->Encode(jflow, encode_options);
 
+    if ((encode_options & ndFlow::ENCODE_STATS)) {
+        jflow["lower_packets"] = event.stats.lower_packets.load();
+        jflow["upper_packets"] = event.stats.upper_packets.load();
+        jflow["total_packets"] = event.stats.total_packets.load();
+        jflow["lower_bytes"] = event.stats.lower_bytes.load();
+        jflow["upper_bytes"] = event.stats.upper_bytes.load();
+        jflow["total_bytes"] = event.stats.total_bytes.load();
+        jflow["detection_packets"] = event.stats.detection_packets.load();
+    }
+
     if (event.event == ndPluginProcessor::EVENT_FLOW_MAP) {
         auto it = jpost_flows.find(event.flow->iface.ifname);
         if (it != jpost_flows.end())
