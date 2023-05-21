@@ -493,7 +493,6 @@ void nppPlugin::DispatchSinkPayload(
 void nppPlugin::EncodeFlow(const nppFlowEvent &event)
 {
     json jflow;
-
     uint8_t encode_options = ndFlow::ENCODE_NONE;
 
     switch (event.event) {
@@ -519,6 +518,7 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event)
     event.flow->Encode(jflow, encode_options);
 
     if ((encode_options & ndFlow::ENCODE_STATS)) {
+        // TODO: ... derive from ndSerializer
         jflow["lower_packets"] = event.stats.lower_packets.load();
         jflow["upper_packets"] = event.stats.upper_packets.load();
         jflow["total_packets"] = event.stats.total_packets.load();
@@ -540,12 +540,38 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event)
                 )
             );
         }
-
-        return;
     }
 
+    json jpayload;
+
+    switch (event.event) {
+    case ndPluginProcessor::EVENT_FLOW_NEW:
+    case ndPluginProcessor::EVENT_FLOW_UPDATED:
+        jpayload["type"] = "flow";
+        break;
+    case ndPluginProcessor::EVENT_FLOW_MAP:
+        jflow.clear();
+        event.flow->Encode(jflow, ndFlow::ENCODE_STATS);
+        jpayload["type"] = "flow_stats";
+        break;
+    case ndPluginProcessor::EVENT_FLOW_EXPIRING:
+        return;
+    case ndPluginProcessor::EVENT_FLOW_EXPIRED:
+        jpayload["type"] = "flow_purge";
+        jpayload["reason"] = (
+            event.flow->ip_protocol == IPPROTO_TCP &&
+            event.flow->flags.tcp_fin_ack.load()
+        ) ? "closed" : "expired";
+        break;
+    }
+
+    jpayload["interface"] = event.flow->iface.ifname;
+    jpayload["internal"] = (event.flow->iface.role == ndIR_LAN);
+    jpayload["established"] = false;
+    jpayload["flow"] = jflow;
+
     DispatchSinkPayload(
-        nppChannelConfig::TYPE_LEGACY_SOCKET, jflow
+        nppChannelConfig::TYPE_LEGACY_SOCKET, jpayload
     );
 }
 

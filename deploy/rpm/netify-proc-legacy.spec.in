@@ -13,7 +13,7 @@ Requires: netifyd >= @NETIFY_MINVER@
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires: netifyd-devel >= @NETIFY_MINVER@
-BuildRequires: autoconf
+BuildRequires: autoconf >= 2.63
 BuildRequires: automake
 BuildRequires: libtool
 Summary: Legacy Processor Plugin for the Netify Agent DPI Engine

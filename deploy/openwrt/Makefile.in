@@ -40,7 +40,8 @@ Writes agent and flow statistics to JSON log files on a configurable interval.
 endef
 
 define Package/@PACKAGE_TARNAME@/conffiles
-/etc/netify.d/@PACKAGE_TARNAME@.json
+/etc/netifyd/@PACKAGE_TARNAME@.json
+/etc/netifyd/plugins.d/@PACKAGE_TARNAME@.conf
 endef
 
 TARGET_CFLAGS+=-ffunction-sections -fdata-sections -Wno-psabi
