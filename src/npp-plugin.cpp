@@ -249,10 +249,13 @@ void nppPlugin::DispatchProcessorEvent(
         auto &fm = flow_map->Acquire(b);
 
         for (auto &it : fm) {
-            if (! it.second->flags.detection_complete.load())
+            if (! it.second->flags.detection_init.load())
                 continue;
             if (it.second->flags.expired.load() ||
                 it.second->flags.expiring.load())
+                continue;
+            if (it.second->stats.lower_packets.load() == 0 &&
+                it.second->stats.upper_packets.load() == 0)
                 continue;
 
             flow_events.push_back(nppFlowEvent(event, it.second));
