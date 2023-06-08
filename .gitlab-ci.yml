@@ -10,7 +10,7 @@ include:
   - '/.gitlab-ci/build-templates.yml'
 
 variables:
-  NETIFY_MINVER: "4.5.13-1"
+  NETIFY_MINVER: "4.5.14-1"
 
 # -------------------------------------------------------------------------
 # Build stage
@@ -18,20 +18,6 @@ variables:
 
 # Debian OS Targets
 #------------------
-
-debian 9 build:
-  extends: .debian_build
-  tags:
-    - docker
-  variables:
-    OS_IMAGE: "debian:9"
-    OS_NAME: "debian"
-    OS_VERSION: "9.0"
-    OS_ARCH: "amd64"
-    OS_ARCH_PATH: "amd64"
-  before_script:
-    - echo "deb http://archive.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list
-    - echo "deb http://archive.debian.org/debian-security stretch/updates main contrib non-free" >> /etc/apt/sources.list
 
 debian 10 build:
   extends: .debian_build
@@ -57,17 +43,6 @@ debian 11 build:
 
 # Ubuntu OS Targets
 #------------------
-
-ubuntu 18.04 build:
-  extends: .debian_build
-  tags:
-    - docker
-  variables:
-    OS_IMAGE: "ubuntu:18.04"
-    OS_NAME: "ubuntu"
-    OS_VERSION: "bionic"
-    OS_ARCH: "amd64"
-    OS_ARCH_PATH: "binary-amd64"
 
 ubuntu 20.04 build:
   extends: .debian_build
