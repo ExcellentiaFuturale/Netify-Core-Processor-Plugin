@@ -1,5 +1,5 @@
 // Netify Agent Legacy Processor
-// Copyright (C) 2021-2022 eGloo Incorporated <http://www.egloo.ca>
+// Copyright (C) 2021-2023 eGloo Incorporated <http://www.egloo.ca>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -98,6 +98,10 @@ void nppChannelConfig::Load(
             this->type = nppChannelConfig::TYPE_LEGACY_HTTP;
         else if (type == "legacy-socket")
             this->type = nppChannelConfig::TYPE_LEGACY_SOCKET;
+        else if (type == "stream-flows")
+            this->type = nppChannelConfig::TYPE_STREAM_FLOWS;
+        else if (type == "stream-stats")
+            this->type = nppChannelConfig::TYPE_STREAM_STATS;
         else
             throw ndPluginException("type", strerror(EINVAL));
     }
@@ -133,7 +137,7 @@ nppPlugin::nppPlugin(
         throw ndPluginException("conf_filename", strerror(EINVAL));
 
     reload = true;
-    http_post = false;
+    dispatch_update = false;
 
     int rc;
     pthread_condattr_t cond_attr;
@@ -184,9 +188,18 @@ void *nppPlugin::Entry(void)
             reload = false;
         }
 
-        if (http_post.load()) {
-            DispatchPostPayload();
-            http_post = false;
+        if (dispatch_update.load()) {
+            dispatch_update = false;
+
+            DispatchLegacyPayload();
+            DispatchStreamPayload();
+
+            jagent_status.clear();
+            jflows.clear();
+            jifaces.clear();
+            jiface_endpoints.clear();
+            jiface_stats.clear();
+            jiface_packet_stats.clear();
         }
 
         Lock();
@@ -212,8 +225,15 @@ void *nppPlugin::Entry(void)
         Unlock();
 
         while (! flow_events_priv.empty()) {
-            EncodeFlow(flow_events_priv.back());
+            json jpayload;
+
+            EncodeFlow(flow_events_priv.back(), jpayload);
             flow_events_priv.pop_back();
+
+            DispatchSinkPayload(
+                nppChannelConfig::TYPE_LEGACY_SOCKET, jpayload);
+            DispatchSinkPayload(
+                nppChannelConfig::TYPE_STREAM_FLOWS, jpayload);
         }
     }
 
@@ -343,6 +363,7 @@ void nppPlugin::DispatchProcessorEvent(
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
     switch (event) {
     case ndPluginProcessor::EVENT_PKT_GLOBAL_STATS:
+        EncodeGlobalPacketStats(stats);
         break;
     default:
         break;
@@ -368,7 +389,7 @@ void nppPlugin::DispatchProcessorEvent(
     //nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
     switch (event) {
     case ndPluginProcessor::EVENT_UPDATE_COMPLETE:
-        http_post = true;
+        dispatch_update = true;
         break;
     default:
         break;
@@ -455,16 +476,16 @@ void nppPlugin::Reload(void)
 }
 
 void nppPlugin::DispatchSinkPayload(
-    nppChannelConfig::Type type, const json &jpayload)
+    nppChannelConfig::Type chan_type, const json &jpayload)
 {
     for (auto &sink : sinks) {
 
         for (auto &channel : sink.second) {
 
-            if (channel.second.type != type) continue;
+            if (channel.second.type != chan_type) continue;
 
             uint8_t flags = (
-                type == nppChannelConfig::TYPE_LEGACY_SOCKET
+                chan_type == nppChannelConfig::TYPE_LEGACY_SOCKET
                 ) ? ndPlugin::DF_ADD_HEADER : ndPlugin::DF_NONE;
 
             switch (channel.second.format) {
@@ -493,7 +514,8 @@ void nppPlugin::DispatchSinkPayload(
     }
 }
 
-void nppPlugin::EncodeFlow(const nppFlowEvent &event)
+void nppPlugin::EncodeFlow(
+    const nppFlowEvent &event, json &jpayload)
 {
     json jflow;
     uint8_t encode_options = ndFlow::ENCODE_NONE;
@@ -532,20 +554,18 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event)
     }
 
     if (event.event == ndPluginProcessor::EVENT_FLOW_MAP) {
-        auto it = jpost_flows.find(event.flow->iface.ifname);
-        if (it != jpost_flows.end())
+        auto it = jflows.find(event.flow->iface.ifname);
+        if (it != jflows.end())
             it->second.push_back(jflow);
         else {
             vector<json> jf = { jflow };
-            jpost_flows.insert(
+            jflows.insert(
                 make_pair(
                     event.flow->iface.ifname, jf
                 )
             );
         }
     }
-
-    json jpayload;
 
     switch (event.event) {
     case ndPluginProcessor::EVENT_FLOW_NEW:
@@ -572,18 +592,11 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event)
     jpayload["internal"] = (event.flow->iface.role == ndIR_LAN);
     jpayload["established"] = false;
     jpayload["flow"] = jflow;
-
-    DispatchSinkPayload(
-        nppChannelConfig::TYPE_LEGACY_SOCKET, jpayload
-    );
 }
 
 void nppPlugin::EncodeAgentStatus(ndInstanceStatus *status)
 {
-    jpost.clear();
-    jpost["version"] = _NPP_LEGACY_JSON_VERSION;
-
-    status->Encode(jpost);
+    status->Encode(jagent_status);
 }
 
 void nppPlugin::EncodeInterfaces(ndInterfaces *interfaces)
@@ -595,10 +608,10 @@ void nppPlugin::EncodeInterfaces(ndInterfaces *interfaces)
         i.second.Encode(jo);
         i.second.EncodeAddrs(jo, keys);
 
-        jpost_ifaces[i.second.ifname] = jo;
+        jifaces[i.second.ifname] = jo;
 
         i.second.EncodeEndpoints(
-            i.second.LastEndpointSnapshot(), jpost_iface_endpoints
+            i.second.LastEndpointSnapshot(), jiface_endpoints
         );
     }
 }
@@ -609,28 +622,72 @@ void nppPlugin::EncodeInterfaceStats(
     json jo;
     stats->Encode(jo);
 
-    jpost_iface_stats[iface] = jo;
+    jiface_stats[iface] = jo;
 }
 
-void nppPlugin::DispatchPostPayload(void)
+void nppPlugin::EncodeGlobalPacketStats(ndPacketStats *stats)
 {
-    jpost["flows"] = jpost_flows;
-    jpost_flows.clear();
+    json jo;
+    stats->Encode(jo);
 
-    jpost["interfaces"] = jpost_ifaces;
-    jpost_ifaces.clear();
+    jiface_packet_stats = jo;
+}
 
-    jpost["devices"] = jpost_iface_endpoints;
-    jpost_iface_endpoints.clear();
-
-    jpost["stats"] = jpost_iface_stats;
-    jpost_iface_stats.clear();
+void nppPlugin::DispatchLegacyPayload(void)
+{
+    json jpost(jagent_status);
+    jpost["version"] = _NPP_LEGACY_JSON_VERSION;
+    jpost["flows"] = jflows;
+    jpost["interfaces"] = jifaces;
+    jpost["devices"] = jiface_endpoints;
+    jpost["stats"] = jiface_stats;
 
     DispatchSinkPayload(
         nppChannelConfig::TYPE_LEGACY_HTTP, jpost
     );
+}
 
-    jpost.clear();
+void nppPlugin::DispatchStreamPayload(void)
+{
+    json jpayload(jagent_status);
+
+    jpayload["type"] = "agent_status";
+
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_STREAM_STATS, jpayload
+    );
+
+    jpayload.clear();
+    jpayload = jifaces;
+    jpayload["type"] = "interfaces";
+
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_STREAM_STATS, jpayload
+    );
+
+    jpayload.clear();
+    jpayload = jiface_endpoints;
+    jpayload["type"] = "endpoints";
+
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_STREAM_STATS, jpayload
+    );
+
+    jpayload.clear();
+    jpayload = jiface_stats;
+    jpayload["type"] = "interface_stats";
+
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_STREAM_STATS, jpayload
+    );
+
+    jpayload.clear();
+    jpayload = jiface_packet_stats;
+    jpayload["type"] = "global_stats";
+
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_STREAM_STATS, jpayload
+    );
 }
 
 ndPluginInit(nppPlugin);

@@ -1,5 +1,5 @@
 // Netify Agent Legacy Processor
-// Copyright (C) 2021-2022 eGloo Incorporated <http://www.egloo.ca>
+// Copyright (C) 2021-2023 eGloo Incorporated <http://www.egloo.ca>
 
 #ifndef _NPP_PLUGIN_H
 #define _NPP_PLUGIN_H
@@ -13,6 +13,8 @@ public:
         TYPE_INVALID,
         TYPE_LEGACY_HTTP,
         TYPE_LEGACY_SOCKET,
+        TYPE_STREAM_FLOWS,
+        TYPE_STREAM_STATS,
     };
 
     enum Format {
@@ -96,7 +98,7 @@ public:
 
 protected:
     atomic<bool> reload;
-    atomic<bool> http_post;
+    atomic<bool> dispatch_update;
 
     void Reload(void);
 
@@ -110,22 +112,26 @@ protected:
     vector<nppFlowEvent> flow_events_priv;
 
     virtual void DispatchSinkPayload(
-        nppChannelConfig::Type type, const json &jpayload);
+        nppChannelConfig::Type chan_type,
+        const json &jpayload);
 
-    void EncodeFlow(const nppFlowEvent &event);
+    void EncodeFlow(const nppFlowEvent &event, json &jpayload);
 
-    json jpost;
-    map<string, vector<json>> jpost_flows;
-    json jpost_ifaces;
-    json jpost_iface_endpoints;
-    json jpost_iface_stats;
+    json jagent_status;
+    map<string, vector<json>> jflows;
+    json jifaces;
+    json jiface_endpoints;
+    json jiface_stats;
+    json jiface_packet_stats;
 
     void EncodeAgentStatus(ndInstanceStatus *status);
     void EncodeInterfaces(ndInterfaces *interfaces);
     void EncodeInterfaceStats(
         const string &iface, ndPacketStats *stats);
+    void EncodeGlobalPacketStats(ndPacketStats *stats);
 
-    void DispatchPostPayload(void);
+    void DispatchLegacyPayload(void);
+    void DispatchStreamPayload(void);
 };
 
 #endif // _NPP_PLUGIN_H

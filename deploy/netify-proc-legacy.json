@@ -15,6 +15,16 @@
                 "enable": true,
                 "type": "legacy-socket"
             }
+        },
+        "sink-mqtt": {
+            "flows": {
+                "enable": false,
+                "type": "stream-flows"
+            },
+            "stats": {
+                "enable": false,
+                "type": "stream-stats"
+            }
         }
     }
 }
