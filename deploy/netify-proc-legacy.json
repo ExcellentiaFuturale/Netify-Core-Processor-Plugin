@@ -5,7 +5,7 @@
         "sink-http-legacy": {
             "default": {
                 "enable": false,
-                "type": "legacy-http",
+                "types": [ "legacy-http" ],
                 "format": "json",
                 "compressor": "gz"
             }
@@ -13,17 +13,21 @@
         "sink-socket": {
             "default": {
                 "enable": true,
-                "type": "legacy-socket"
+                "types": [ "legacy-socket" ]
+            },
+            "websocket": {
+                "enable": false,
+                "types": [ "stream-flows", "stream-stats" ]
             }
         },
         "sink-mqtt": {
             "flows": {
                 "enable": false,
-                "type": "stream-flows"
+                "types": [ "stream-flows" ]
             },
             "stats": {
                 "enable": false,
-                "type": "stream-stats"
+                "types": [ "stream-stats" ]
             }
         }
     }

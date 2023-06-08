@@ -91,19 +91,33 @@ class ndInstanceStatus;
 void nppChannelConfig::Load(
     const string &channel, const json &jconf)
 {
-    auto it = jconf.find("type");
-    if (it != jconf.end() && it->type() == json::value_t::string) {
-        string type = it->get<string>();
-        if (type == "legacy-http")
-            this->type = nppChannelConfig::TYPE_LEGACY_HTTP;
-        else if (type == "legacy-socket")
-            this->type = nppChannelConfig::TYPE_LEGACY_SOCKET;
-        else if (type == "stream-flows")
-            this->type = nppChannelConfig::TYPE_STREAM_FLOWS;
-        else if (type == "stream-stats")
-            this->type = nppChannelConfig::TYPE_STREAM_STATS;
-        else
-            throw ndPluginException("type", strerror(EINVAL));
+    auto it = jconf.find("types");
+    if (it != jconf.end() && it->type() == json::value_t::array) {
+        vector<string> types = it->get<vector<string>>();
+        for (auto &type : types) {
+            if (type == "legacy-http") {
+                this->types.push_back(
+                    nppChannelConfig::TYPE_LEGACY_HTTP
+                );
+            }
+            else if (type == "legacy-socket") {
+                this->types.push_back(
+                    nppChannelConfig::TYPE_LEGACY_SOCKET
+                );
+            }
+            else if (type == "stream-flows") {
+                this->types.push_back(
+                    nppChannelConfig::TYPE_STREAM_FLOWS
+                );
+            }
+            else if (type == "stream-stats") {
+                this->types.push_back(
+                    nppChannelConfig::TYPE_STREAM_STATS
+                );
+            }
+            else
+                throw ndPluginException("types", strerror(EINVAL));
+        }
     }
 
     it = jconf.find("format");
@@ -482,7 +496,10 @@ void nppPlugin::DispatchSinkPayload(
 
         for (auto &channel : sink.second) {
 
-            if (channel.second.type != chan_type) continue;
+            if (find(
+                channel.second.types.begin(),
+                channel.second.types.end(), chan_type
+                ) == channel.second.types.end()) continue;
 
             uint8_t flags = (
                 chan_type == nppChannelConfig::TYPE_LEGACY_SOCKET

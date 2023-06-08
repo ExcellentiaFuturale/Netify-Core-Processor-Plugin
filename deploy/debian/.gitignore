@@ -1,6 +1,6 @@
 Makefile
 Makefile.in
-debian.changelog
-debian.control
-debian.rules
+changelog
+control
+rules
 netify-proc-legacy.install

@@ -29,20 +29,19 @@ public:
     };
 
     nppChannelConfig() :
-        type(TYPE_INVALID),
         format(FORMAT_JSON), compressor(COMPRESSOR_NONE) { }
 
     void Load(const string &channel, const json &jconf);
     inline void Load(const string &channel,
         const json &jconf, nppChannelConfig &defaults) {
-        type = defaults.type;
+        types = defaults.types;
         format = defaults.format;
         compressor = defaults.compressor;
         Load(channel, jconf);
     }
 
     string channel;
-    Type type;
+    vector<Type> types;
     Format format;
     Compressor compressor;
 };

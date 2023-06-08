@@ -1,7 +1,7 @@
 # Netify Agent Legacy Processor Plugin
 
 AC_PREREQ([2.69])
-AC_INIT([Netify Legacy Processor Plugin], [1.0.5],
+AC_INIT([Netify Legacy Processor Plugin], [1.0.6],
     [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-legacy/issues],
     [netify-proc-legacy],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
