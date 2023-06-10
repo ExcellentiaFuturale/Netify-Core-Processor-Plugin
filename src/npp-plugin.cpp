@@ -317,19 +317,16 @@ void nppPlugin::DispatchProcessorEvent(
 {
 #if 0
     nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
+#endif
     switch (event) {
     case ndPluginProcessor::EVENT_FLOW_NEW:
-        break;
     case ndPluginProcessor::EVENT_FLOW_UPDATED:
-        break;
-    case ndPluginProcessor::EVENT_FLOW_EXPIRING:
-        break;
     case ndPluginProcessor::EVENT_FLOW_EXPIRED:
         break;
     default:
         return;
     }
-#endif
+
     Lock();
 
     flow_events.push_back(nppFlowEvent(event, flow));
@@ -543,19 +540,15 @@ void nppPlugin::EncodeFlow(
         encode_options = ndFlow::ENCODE_ALL;
         break;
     case ndPluginProcessor::EVENT_FLOW_UPDATED:
-        encode_options = (
-            ndFlow::ENCODE_METADATA | ndFlow::ENCODE_STATS
-        );
-        break;
-    case ndPluginProcessor::EVENT_FLOW_EXPIRING:
+        encode_options =
+            ndFlow::ENCODE_METADATA | ndFlow::ENCODE_STATS;
         break;
     case ndPluginProcessor::EVENT_FLOW_EXPIRED:
         encode_options = ndFlow::ENCODE_STATS;
         break;
-    }
-
-    if (encode_options == ndFlow::ENCODE_NONE)
+    default:
         return;
+    }
 
     event.flow->Encode(jflow, encode_options);
 
@@ -594,8 +587,6 @@ void nppPlugin::EncodeFlow(
         event.flow->Encode(jflow, ndFlow::ENCODE_STATS);
         jpayload["type"] = "flow_stats";
         break;
-    case ndPluginProcessor::EVENT_FLOW_EXPIRING:
-        return;
     case ndPluginProcessor::EVENT_FLOW_EXPIRED:
         jpayload["type"] = "flow_purge";
         jpayload["reason"] = (
@@ -603,6 +594,8 @@ void nppPlugin::EncodeFlow(
             event.flow->flags.tcp_fin_ack.load()
         ) ? "closed" : "expired";
         break;
+    default:
+        return;
     }
 
     jpayload["interface"] = event.flow->iface.ifname;
