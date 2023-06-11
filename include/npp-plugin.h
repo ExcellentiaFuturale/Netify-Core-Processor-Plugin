@@ -51,8 +51,7 @@ class nppFlowEvent
 public:
     nppFlowEvent(
         ndPluginProcessor::Event event, nd_flow_ptr& flow)
-        : flow(flow), event(event), stats(flow->stats) {
-    }
+        : flow(flow), event(event), stats(flow->stats) { }
 
     nd_flow_ptr flow;
     ndPluginProcessor::Event event;

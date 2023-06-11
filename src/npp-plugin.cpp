@@ -244,10 +244,12 @@ void *nppPlugin::Entry(void)
             EncodeFlow(flow_events_priv.back(), jpayload);
             flow_events_priv.pop_back();
 
-            DispatchSinkPayload(
-                nppChannelConfig::TYPE_LEGACY_SOCKET, jpayload);
-            DispatchSinkPayload(
-                nppChannelConfig::TYPE_STREAM_FLOWS, jpayload);
+            if (jpayload.empty() == false) {
+                DispatchSinkPayload(
+                    nppChannelConfig::TYPE_LEGACY_SOCKET, jpayload);
+                DispatchSinkPayload(
+                    nppChannelConfig::TYPE_STREAM_FLOWS, jpayload);
+            }
         }
     }
 
@@ -550,18 +552,7 @@ void nppPlugin::EncodeFlow(
         return;
     }
 
-    event.flow->Encode(jflow, encode_options);
-
-    if ((encode_options & ndFlow::ENCODE_STATS)) {
-        // TODO: ... derive from ndSerializer
-        jflow["lower_packets"] = event.stats.lower_packets.load();
-        jflow["upper_packets"] = event.stats.upper_packets.load();
-        jflow["total_packets"] = event.stats.total_packets.load();
-        jflow["lower_bytes"] = event.stats.lower_bytes.load();
-        jflow["upper_bytes"] = event.stats.upper_bytes.load();
-        jflow["total_bytes"] = event.stats.total_bytes.load();
-        jflow["detection_packets"] = event.stats.detection_packets.load();
-    }
+    event.flow->Encode(jflow, event.stats, encode_options);
 
     if (event.event == ndPluginProcessor::EVENT_FLOW_MAP) {
         auto it = jflows.find(event.flow->iface.ifname);
@@ -583,9 +574,10 @@ void nppPlugin::EncodeFlow(
         jpayload["type"] = "flow";
         break;
     case ndPluginProcessor::EVENT_FLOW_MAP:
-        jflow.clear();
-        event.flow->Encode(jflow, ndFlow::ENCODE_STATS);
         jpayload["type"] = "flow_stats";
+        jflow.clear();
+        event.flow->Encode(jflow,
+            event.stats, ndFlow::ENCODE_STATS);
         break;
     case ndPluginProcessor::EVENT_FLOW_EXPIRED:
         jpayload["type"] = "flow_purge";
