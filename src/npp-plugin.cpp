@@ -637,15 +637,33 @@ void nppPlugin::EncodeGlobalPacketStats(ndPacketStats *stats)
 
 void nppPlugin::DispatchLegacyPayload(void)
 {
-    json jpost(jagent_status);
-    jpost["version"] = _NPP_LEGACY_JSON_VERSION;
-    jpost["flows"] = jflows;
-    jpost["interfaces"] = jifaces;
-    jpost["devices"] = jiface_endpoints;
-    jpost["stats"] = jiface_stats;
+    json jpayload(jagent_status);
+    jpayload["version"] = _NPP_LEGACY_JSON_VERSION;
+    jpayload["flows"] = jflows;
+    jpayload["interfaces"] = jifaces;
+    jpayload["devices"] = jiface_endpoints;
+    jpayload["stats"] = jiface_stats;
 
     DispatchSinkPayload(
-        nppChannelConfig::TYPE_LEGACY_HTTP, jpost
+        nppChannelConfig::TYPE_LEGACY_HTTP, jpayload
+    );
+
+    jpayload.clear();
+    jpayload["type"] = "agent_hello";
+    jpayload["agent_version"] = nd_get_version();
+    jpayload["build_version"] = nd_get_version_and_features();
+    jpayload["json_version"] = _NPP_LEGACY_JSON_VERSION;
+
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_LEGACY_SOCKET, jpayload
+    );
+
+    jpayload.clear();
+    jpayload = jagent_status;
+    jpayload["type"] = "agent_status";
+
+    DispatchSinkPayload(
+        nppChannelConfig::TYPE_LEGACY_SOCKET, jpayload
     );
 }
 
