@@ -3,7 +3,7 @@
 export NETIFYD_PREFIX=/tmp/netify-agent
 
 # CentOS 7x
- export PKG_CONFIG_PATH=${NETIFYD_PREFIX}/usr/lib/pkgconfig:/usr/lib/pkgconfig
+export PKG_CONFIG_PATH=${NETIFYD_PREFIX}/usr/lib64/pkgconfig:/usr/lib/pkgconfig
 # Ubuntu 20x
 #export PKG_CONFIG_PATH=${NETIFYD_PREFIX}/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig
 
