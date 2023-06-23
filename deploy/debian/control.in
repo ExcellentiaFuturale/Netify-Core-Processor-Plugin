@@ -9,3 +9,15 @@ Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, netifyd (>= @NETIFY_MINVER@)
 Description: Netify Legacy Processor
  This plugin provides template processor integration with the Netify DPI engine.
+ Report bugs to: @PACKAGE_BUGREPORT@
+
+Package: @PACKAGE_TARNAME@-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends:
+    @PACKAGE_TARNAME@ (= ${binary:Version}),
+    ${misc:Depends}
+Description: Debugging symbols for @PACKAGE_TARNAME@
+ This plugin provides template processor integration with the Netify DPI engine.
+ Report bugs to: @PACKAGE_BUGREPORT@
