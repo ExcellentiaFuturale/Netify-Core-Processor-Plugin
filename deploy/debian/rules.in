@@ -3,10 +3,18 @@
 export DESTDIR=debian/@PACKAGE_TARNAME@
 
 %:
-	dh $@
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	dh_auto_configure -- ${DEB_CONFIGURE_EXTRA_FLAGS}
+
+.PHONY: override_dh_strip
+override_dh_strip:
+	dh_strip --dbg-package=@PACKAGE_TARNAME@-dbg
 
 override_dh_install:
-	dh_auto_install
+	dh_auto_install --destdir=debian/@PACKAGE_TARNAME@
+	rm -rf debian/@PACKAGE_TARNAME@/usr/local
 	rm -rf debian/@PACKAGE_TARNAME@/usr/share/doc
 	rm -f debian/@PACKAGE_TARNAME@/usr/lib/*/*.a
 	rm -f debian/@PACKAGE_TARNAME@/usr/lib/*/*.la
