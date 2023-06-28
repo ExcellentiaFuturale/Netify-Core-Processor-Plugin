@@ -223,8 +223,18 @@ void *nppPlugin::Entry(void)
 
             if ((rc = pthread_mutex_lock(&cond_mutex)) != 0)
                 throw ndThreadException(strerror(rc));
-            if ((rc = pthread_cond_wait(&lock_cond, &cond_mutex)) != 0)
+
+            struct timespec ts_cond;
+            if (clock_gettime(CLOCK_MONOTONIC, &ts_cond) != 0)
+                throw ndThreadException(strerror(errno));
+
+            ts_cond.tv_sec += 1;
+            if ((rc = pthread_cond_timedwait(
+                &lock_cond, &cond_mutex, &ts_cond)) != 0 &&
+                rc != ETIMEDOUT) {
                 throw ndThreadException(strerror(rc));
+            }
+
             if ((rc = pthread_mutex_unlock(&cond_mutex)) != 0)
                 throw ndThreadException(strerror(rc));
 
@@ -555,14 +565,14 @@ void nppPlugin::EncodeFlow(
     event.flow->Encode(jflow, event.stats, encode_options);
 
     if (event.event == ndPluginProcessor::EVENT_FLOW_MAP) {
-        auto it = jflows.find(event.flow->iface.ifname);
+        auto it = jflows.find(event.flow->iface->ifname);
         if (it != jflows.end())
             it->second.push_back(jflow);
         else {
             vector<json> jf = { jflow };
             jflows.insert(
                 make_pair(
-                    event.flow->iface.ifname, jf
+                    event.flow->iface->ifname, jf
                 )
             );
         }
@@ -590,8 +600,8 @@ void nppPlugin::EncodeFlow(
         return;
     }
 
-    jpayload["interface"] = event.flow->iface.ifname;
-    jpayload["internal"] = (event.flow->iface.role == ndIR_LAN);
+    jpayload["interface"] = event.flow->iface->ifname;
+    jpayload["internal"] = (event.flow->iface->role == ndIR_LAN);
     jpayload["established"] = false;
     jpayload["flow"] = jflow;
 }
@@ -607,13 +617,13 @@ void nppPlugin::EncodeInterfaces(ndInterfaces *interfaces)
 
     for (auto &i : *interfaces) {
         json jo;
-        i.second.Encode(jo);
-        i.second.EncodeAddrs(jo, keys);
+        i.second->Encode(jo);
+        i.second->EncodeAddrs(jo, keys);
 
-        jifaces[i.second.ifname] = jo;
+        jifaces[i.second->ifname] = jo;
 
-        i.second.EncodeEndpoints(
-            i.second.LastEndpointSnapshot(), jiface_endpoints
+        i.second->EncodeEndpoints(
+            i.second->LastEndpointSnapshot(), jiface_endpoints
         );
     }
 }
