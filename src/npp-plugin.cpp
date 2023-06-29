@@ -270,7 +270,7 @@ void nppPlugin::DispatchEvent(ndPlugin::Event event, void *param)
 {
     switch (event) {
     case ndPlugin::EVENT_RELOAD:
-        Reload();
+        reload = true;
         break;
     default:
         break;
