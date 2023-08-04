@@ -3,7 +3,7 @@
     "compressor": "none",
     "sinks": {
         "sink-http-legacy": {
-            "default": {
+            "legacy": {
                 "enable": false,
                 "types": [ "legacy-http" ],
                 "format": "json",
