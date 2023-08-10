@@ -7,7 +7,7 @@
 
 [proc-legacy]
 enable = no
-plugin_library = @libdir@/lib@PACKAGE_TARNAME@.so
+plugin_library = @libdir@/lib@PACKAGE_TARNAME@.so.0.0.0
 conf_filename = ${path_state_persistent}/@PACKAGE_TARNAME@.json
 
 # vim: set ft=dosini :
