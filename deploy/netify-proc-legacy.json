@@ -2,7 +2,7 @@
     "format": "json",
     "compressor": "none",
     "sinks": {
-        "sink-http-legacy": {
+        "sink-http": {
             "legacy": {
                 "enable": false,
                 "types": [ "legacy-http" ],
