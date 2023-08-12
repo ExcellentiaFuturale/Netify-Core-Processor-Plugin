@@ -1,4 +1,4 @@
-// Netify Agent Legacy Processor
+// Netify Agent Core Processor
 // Copyright (C) 2021-2023 eGloo Incorporated <http://www.egloo.ca>
 //
 // This program is free software: you can redistribute it and/or modify
@@ -205,7 +205,7 @@ void *nppPlugin::Entry(void)
         if (dispatch_update.load()) {
             dispatch_update = false;
 
-            DispatchLegacyPayload();
+            DispatchCorePayload();
             DispatchStreamPayload();
 
             jagent_status.clear();
@@ -645,7 +645,7 @@ void nppPlugin::EncodeGlobalPacketStats(ndPacketStats *stats)
     jiface_packet_stats = jo;
 }
 
-void nppPlugin::DispatchLegacyPayload(void)
+void nppPlugin::DispatchCorePayload(void)
 {
     json jpayload(jagent_status);
     jpayload["version"] = _NPP_LEGACY_JSON_VERSION;

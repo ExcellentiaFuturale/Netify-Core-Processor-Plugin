@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 9), autoconf, automake, bc, build-essential, libtoo
 Package: @PACKAGE_TARNAME@
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, netifyd (>= @NETIFY_MINVER@)
-Description: Netify Legacy Processor
+Description: Netify Core Processor
  This plugin provides template processor integration with the Netify DPI engine.
  Report bugs to: @PACKAGE_BUGREPORT@
 

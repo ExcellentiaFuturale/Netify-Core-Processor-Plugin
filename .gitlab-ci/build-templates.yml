@@ -48,10 +48,10 @@
     - ./autogen.sh
     - ./configure --prefix=/usr --includedir=\${prefix}/include --mandir=\${prefix}/share/man --sysconfdir=/etc --localstatedir=/var
     - make -C deploy/rpm
-    - grep ^Version deploy/rpm/netify-proc-legacy.spec | sed 's/.*[[:space:]]//' > /tmp/version
-    - tar --exclude=.git --transform "s,^,netify-proc-legacy-`cat /tmp/version`/," -czf netify-proc-legacy-`cat /tmp/version`.tar.gz *
+    - grep ^Version deploy/rpm/netify-proc-core.spec | sed 's/.*[[:space:]]//' > /tmp/version
+    - tar --exclude=.git --transform "s,^,netify-proc-core-`cat /tmp/version`/," -czf netify-proc-core-`cat /tmp/version`.tar.gz *
     - echo "%dist .os${RPMOS_VERSION}" > ~/.rpmmacros
-    - rpmbuild -bs deploy/rpm/netify-proc-legacy.spec --define "_sourcedir $PWD" --define "_srcrpmdir $PWD"
+    - rpmbuild -bs deploy/rpm/netify-proc-core.spec --define "_sourcedir $PWD" --define "_srcrpmdir $PWD"
     - rpmbuild --rebuild *.src.rpm
     # Copy artifacts (packages) to mirror
     - mkdir -p builds/$CI_PROJECT_NAME/$RPMOS_OS/$RPMOS_VERSION/$RPMOS_ARCH

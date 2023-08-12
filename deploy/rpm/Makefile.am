@@ -1,4 +1,4 @@
-# Netify Legacy Processor RPM Automake File
+# Netify Core Processor RPM Automake File
 # Copyright (C) 2023 eGloo Incorporated
 
 RPMFILES = $(PACKAGE_TARNAME).spec

@@ -1,4 +1,4 @@
-// Netify Agent Legacy Processor
+// Netify Agent Core Processor
 // Copyright (C) 2021-2023 eGloo Incorporated <http://www.egloo.ca>
 
 #ifndef _NPP_PLUGIN_H
@@ -128,7 +128,7 @@ protected:
         const string &iface, ndPacketStats *stats);
     void EncodeGlobalPacketStats(ndPacketStats *stats);
 
-    void DispatchLegacyPayload(void);
+    void DispatchCorePayload(void);
     void DispatchStreamPayload(void);
 };
 

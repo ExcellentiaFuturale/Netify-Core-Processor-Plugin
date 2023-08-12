@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I ../m4
 
 AM_CPPFLAGS = $(CPPFLAGS) -D_GNU_SOURCE -I ../include $(LIBNETIFYD_CFLAGS)
 
-lib_LTLIBRARIES = libnetify-proc-legacy.la
+lib_LTLIBRARIES = libnetify-proc-core.la
 
-libnetify_proc_legacy_la_SOURCES = npp-plugin.cpp
-libnetify_proc_legacy_la_LIBADD = $(LIBNETIFYD_LIBS)
+libnetify_proc_core_la_SOURCES = npp-plugin.cpp
+libnetify_proc_core_la_LIBADD = $(LIBNETIFYD_LIBS)

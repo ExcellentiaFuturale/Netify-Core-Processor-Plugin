@@ -3,4 +3,4 @@ Makefile.in
 changelog
 control
 rules
-netify-proc-legacy.install
+netify-proc-core.install

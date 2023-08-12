@@ -1,11 +1,11 @@
-# Netify Legacy Processor Plugin Loader
+# Netify Core Processor Plugin Loader
 # Copyright (C) 2023 eGloo Incorporated
 #
 # This is free software, licensed under the GNU General Public License v3.
 #
 ##############################################################################
 
-[proc-legacy]
+[proc-core]
 enable = no
 plugin_library = @libdir@/lib@PACKAGE_TARNAME@.so.0.0.0
 conf_filename = ${path_state_persistent}/@PACKAGE_TARNAME@.json

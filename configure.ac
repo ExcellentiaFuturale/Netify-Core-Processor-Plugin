@@ -1,9 +1,9 @@
-# Netify Agent Legacy Processor Plugin
+# Netify Agent Core Processor Plugin
 
 AC_PREREQ([2.69])
-AC_INIT([Netify Legacy Processor Plugin], [1.0.12],
-    [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-legacy/issues],
-    [netify-proc-legacy],[http://www.netify.ai/])
+AC_INIT([Netify Core Processor Plugin], [1.0.13],
+    [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core/issues],
+    [netify-proc-core],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
 AC_CONFIG_SRCDIR([src/npp-plugin.cpp])
 AC_CONFIG_HEADERS([config.h])
@@ -76,7 +76,7 @@ fi
 
 AC_DEFINE_UNQUOTED(GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(GIT_DATE, "${GIT_DATE}", [Last GIT change])
-AC_SUBST([GIT_SOURCE_URL], [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-legacy.git])
+AC_SUBST([GIT_SOURCE_URL], [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core.git])
 
 # Output files
 AC_CONFIG_FILES([Makefile])

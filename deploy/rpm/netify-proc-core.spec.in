@@ -1,4 +1,4 @@
-# Netify Agent Legacy Processor
+# Netify Agent Core Processor
 
 Name: @PACKAGE_TARNAME@
 Version: @PACKAGE_VERSION@
@@ -16,7 +16,7 @@ BuildRequires: netifyd-devel >= @NETIFY_MINVER@
 BuildRequires: autoconf >= 2.63
 BuildRequires: automake
 BuildRequires: libtool
-Summary: Legacy Processor Plugin for the Netify Agent DPI Engine
+Summary: Core Processor Plugin for the Netify Agent DPI Engine
 
 %description
 This is a aggregated flow statistics plugin for the Netify Agent DPI Engine.

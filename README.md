@@ -1,7 +1,7 @@
-# Netify Agent Legacy Processor Plugin
+# Netify Agent Core Processor Plugin
 Copyright &copy; 2022 eGloo Incorporated
 
-[![pipeline status](https://gitlab.com/netify.ai/private/netify-plugins/netify-proc-legacy/badges/master/pipeline.svg)](https://gitlab.com/netify.ai/private/netify-plugins/netify-proc-legacy/-/commits/master)
+[![pipeline status](https://gitlab.com/netify.ai/private/netify-plugins/netify-proc-core/badges/master/pipeline.svg)](https://gitlab.com/netify.ai/private/netify-plugins/netify-proc-core/-/commits/master)
 
 ## Overview
 
@@ -11,7 +11,7 @@ A new log file will be created after the configured interval of time has expired
 
 ## Configuration
 
-The default configuration path is: `/etc/netifyd/netify-proc-legacy.json`
+The default configuration path is: `/etc/netifyd/netify-proc-core.json`
 
 When the configuration file is updated, it can be re-loaded without restarting by sending a `SIGHUP` to the Netify Agent.  The plugin configuration file will also be reloaded.
 
@@ -38,7 +38,7 @@ The following example configuration instructs the plugin to output flow stats ev
 {
     "privacy_mode": false,
     "log_path": "/tmp",
-    "log_prefix": "netify-proc-legacy-",
+    "log_prefix": "netify-proc-core-",
     "log_suffix": ".json",
     "log_interval": 60,
     "overwrite": false,
