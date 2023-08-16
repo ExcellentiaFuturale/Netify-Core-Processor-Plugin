@@ -544,16 +544,13 @@ void nppPlugin::EncodeFlow(
     const nppFlowEvent &event, json &jpayload)
 {
     json jflow;
-    uint8_t encode_options = ndFlow::ENCODE_NONE;
+    uint8_t encode_options = ndFlow::ENCODE_METADATA;
 
     switch (event.event) {
     case ndPluginProcessor::EVENT_FLOW_MAP:
     case ndPluginProcessor::EVENT_FLOW_NEW:
-        encode_options = ndFlow::ENCODE_ALL;
-        break;
     case ndPluginProcessor::EVENT_FLOW_UPDATED:
-        encode_options =
-            ndFlow::ENCODE_METADATA | ndFlow::ENCODE_STATS;
+        encode_options |= ndFlow::ENCODE_TUNNELS;
         break;
     case ndPluginProcessor::EVENT_FLOW_EXPIRED:
         encode_options = ndFlow::ENCODE_STATS;
@@ -602,7 +599,8 @@ void nppPlugin::EncodeFlow(
 
     jpayload["interface"] = event.flow->iface->ifname;
     jpayload["internal"] = (event.flow->iface->role == ndIR_LAN);
-    jpayload["established"] = false;
+    // XXX: Deprecated
+    // jpayload["established"] = false;
     jpayload["flow"] = jflow;
 }
 
