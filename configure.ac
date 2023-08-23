@@ -78,9 +78,15 @@ AC_DEFINE_UNQUOTED(GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(GIT_DATE, "${GIT_DATE}", [Last GIT change])
 AC_SUBST([GIT_SOURCE_URL], [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core.git])
 
+BUILD_UUID=`uuidgen`
+AC_DEFINE_UNQUOTED(NPP_BUILD_UUID, "${BUILD_UUID}", [Build UUID])
+
 # Output files
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([deploy/Makefile deploy/plugins.d/Makefile deploy/openwrt/Makefile deploy/debian/Makefile deploy/rpm/Makefile])
 
 AC_OUTPUT
+
+AS_BOX([${PACKAGE_NAME} v${PACKAGE_VERSION}])
+AC_MSG_NOTICE([Build UUID: ${BUILD_UUID}])
