@@ -1,7 +1,7 @@
 # Netify Agent Core Processor Plugin
 
 AC_PREREQ([2.69])
-AC_INIT([Netify Core Processor Plugin], [1.0.14],
+AC_INIT([Netify Core Processor Plugin], [1.0.15],
     [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core/issues],
     [netify-proc-core],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
@@ -12,7 +12,7 @@ AC_USE_SYSTEM_EXTENSIONS
 
 # Set the minimum Agent version this plugin requires.
 # When updating this version, remember to update .gitlab-ci.yml too.
-NETIFY_MINVER=4.5.18
+NETIFY_MINVER=4.5.23
 AC_SUBST([NETIFY_MINVER], [$NETIFY_MINVER])
 
 # Checks for programs.
@@ -21,6 +21,20 @@ AC_PROG_INSTALL
 LT_INIT
 PKG_PROG_PKG_CONFIG([0.23])
 AX_PKG_INSTALLDIR
+
+BUILD_UUID=00000000-0000-0000-0000-000000000000
+
+AC_PATH_PROG([uuidgen], [uuidgen], [false])
+AS_IF([test "x$ac_cv_path_uuidgen" != "xfalse"], [
+  BUILD_UUID=`${ac_cv_path_uuidgen}`
+], [
+  AC_PATH_PROG([uuid], [uuid], [false])
+  AS_IF([test "x$ac_cv_path_uuid" != "xfalse"], [
+    BUILD_UUID=`${ac_cv_path_uuid}`
+  ])
+])
+
+AC_DEFINE_UNQUOTED(NPP_BUILD_UUID, "${BUILD_UUID}", [Build UUID])
 
 # Check compiler flags (gnu++11)
 AX_CXX_COMPILE_STDCXX_11([ext], [optional])
@@ -77,9 +91,6 @@ fi
 AC_DEFINE_UNQUOTED(GIT_RELEASE, "${GIT_RELEASE}", [GIT Release])
 AC_DEFINE_UNQUOTED(GIT_DATE, "${GIT_DATE}", [Last GIT change])
 AC_SUBST([GIT_SOURCE_URL], [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core.git])
-
-BUILD_UUID=`uuidgen`
-AC_DEFINE_UNQUOTED(NPP_BUILD_UUID, "${BUILD_UUID}", [Build UUID])
 
 # Output files
 AC_CONFIG_FILES([Makefile])

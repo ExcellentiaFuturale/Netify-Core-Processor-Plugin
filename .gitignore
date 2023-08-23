@@ -1,6 +1,7 @@
 aclocal.m4
 autom4te.cache/
 compile
+compile_flags.txt
 config.guess
 config.h
 config.h.in
@@ -9,6 +10,7 @@ config.log
 config.status
 config.sub
 configure
+configure~
 depcomp
 .deps/
 *.gz
