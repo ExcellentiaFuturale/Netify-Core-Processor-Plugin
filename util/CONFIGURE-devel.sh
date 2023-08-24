@@ -1,9 +1,11 @@
 #!/bin/bash
 
 : ${COMPILER:=gcc}
+: ${CPPFLAGS:="-pipe -g -O1 -fexceptions -Wall"}
+: ${LDFLAGS:=}
 : ${VARIANT:=generic}
 : ${NETIFYD_PREFIX:=/tmp/netify-agent}
-: ${ENABLE_ADDRESS_SANITIZER:=false}
+: ${ENABLE_SANITIZER:=false}
 : ${ENABLE_STACK_PROTECTION:=false}
 
 : ${prefix:=/usr}
@@ -20,48 +22,39 @@
 : ${mandir:=${prefix}/share/man}
 : ${infodir:=${prefix}/share/info}
 
-if [ "x${ENABLE_ADDRESS_SANITIZER}" == "xtrue" ]; then
+export PKG_CONFIG_PATH="${NETIFYD_PREFIX}${libdir}/pkgconfig"
+
+if [ "x${ENABLE_SANITIZER}" == "xtrue" ]; then
   if [ "x${COMPILER}" == "xgcc" ]; then
-    echo "Overriding COMPILER to clang, address sanitzer enabled."
+    echo "Overriding COMPILER to clang, sanitizer enabled."
     COMPILER=clang
-    export LDFLAGS=-fsanitize=address
   fi
 fi
-
-echo "Options:"
-echo " COMPILER: ${COMPILER}"
-echo " VARIANT: ${VARIANT}"
-echo " NETIFYD_PREFIX: ${NETIFYD_PREFIX}"
-echo " ENABLE_ADDRESS_SANITIZER: ${ENABLE_ADDRESS_SANITIZER}"
-echo " ENABLE_STACK_PROTECTION: ${ENABLE_STACK_PROTECTION}"
-
-if [ $# -gt 0 -a "x$1" == "xhelp" ]; then exit 0; fi
-
-CPPFLAGS_COMMON="-pipe -g -O1 -fexceptions -Wall"
 
 if [ "x${COMPILER}" == "xgcc" ]; then
   export CC=gcc
   export CXX=g++
-  CPPFLAGS_COMMON="${CPPFLAGS_COMMON} -grecord-gcc-switches"
+  CPPFLAGS+=" -grecord-gcc-switches"
 elif [ "x${COMPILER}" == "xclang" ]; then
   export CC=clang
   export CXX=clang++
-  CPPFLAGS_COMMON="${CPPFLAGS_COMMON} -fsanitize=address -fno-omit-frame-pointer"
+
+  if [ "x${ENABLE_SANITIZER}" != "xfalse" ]; then
+    CPPFLAGS+=" -fsanitize=${ENABLE_SANITIZER} -fno-omit-frame-pointer"
+    LDFLAGS+=" -fsanitize=${ENABLE_SANITIZER}"
+  fi
 else
   echo "ERROR: Unsupported COMPILER: ${COMPILER}"
   exit 1
 fi
 
 if [ "x${ENABLE_STACK_PROTECTION}" == "xtrue" ]; then
-  CPPFLAGS_COMMON="${CPPFLAGS_COMMON} -fstack-clash-protection \
+  CPPFLAGS+=" -fstack-clash-protection \
     -fstack-protector-strong -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2"
 fi
 
-export PKG_CONFIG_PATH="${NETIFYD_PREFIX}${libdir}/pkgconfig"
-
-export CPPFLAGS="${CPPFLAGS_COMMON} $(pkg-config --define-variable=includedir=${NETIFYD_PREFIX}${includedir} libnetifyd --cflags)"
-
-export LDFLAGS="${LDFLAGS} $(pkg-config --define-variable=libdir=${NETIFYD_PREFIX}${libdir} libnetifyd --libs-only-L)"
+export CPPFLAGS+=" $(pkg-config --define-variable=includedir=${NETIFYD_PREFIX}${includedir} libnetifyd --cflags)"
+export LDFLAGS+=" $(pkg-config --define-variable=libdir=${NETIFYD_PREFIX}${libdir} libnetifyd --libs-only-L)"
 
 case "x${VARIANT}" in
 xgeneric)
@@ -75,6 +68,17 @@ xubuntu20x)
   exit 1
   ;;
 esac
+
+echo "Options:"
+echo " COMPILER: ${COMPILER}"
+echo " CPPFLAGS: ${CPPFLAGS}"
+echo " LDFLAGS: ${LDFLAGS}"
+echo " VARIANT: ${VARIANT}"
+echo " NETIFYD_PREFIX: ${NETIFYD_PREFIX}"
+echo " ENABLE_SANITIZER: ${ENABLE_SANITIZER}"
+echo " ENABLE_STACK_PROTECTION: ${ENABLE_STACK_PROTECTION}"
+
+if [ $# -gt 0 -a "x$1" == "xhelp" ]; then exit 0; fi
 
 ./configure \
     --program-prefix= \
