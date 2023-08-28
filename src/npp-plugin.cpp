@@ -467,7 +467,7 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event,
 
   switch (event.event) {
     case ndPluginProcessor::EVENT_FLOW_MAP:
-      encode_options = ndFlow::ENCODE_STATS;
+      encode_options |= ndFlow::ENCODE_STATS;
       break;
     case ndPluginProcessor::EVENT_FLOW_NEW:
     case ndPluginProcessor::EVENT_FLOW_UPDATED:

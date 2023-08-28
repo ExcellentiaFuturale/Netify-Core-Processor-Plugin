@@ -1,7 +1,7 @@
 # Netify Agent Core Processor Plugin
 
 AC_PREREQ([2.69])
-AC_INIT([Netify Core Processor Plugin], [1.0.16],
+AC_INIT([Netify Core Processor Plugin], [1.0.17],
     [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core/issues],
     [netify-proc-core],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
