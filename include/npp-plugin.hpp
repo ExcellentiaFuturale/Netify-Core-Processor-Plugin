@@ -136,7 +136,7 @@ class nppPlugin : public ndPluginProcessor {
                             ndPacketStats *stats);
   void EncodeGlobalPacketStats(ndPacketStats *stats);
 
-  void DispatchCorePayload(void);
+  void DispatchLegacyPayload(void);
   void DispatchStreamPayload(void);
 };
 

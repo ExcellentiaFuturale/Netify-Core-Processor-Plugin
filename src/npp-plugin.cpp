@@ -134,7 +134,7 @@ void *nppPlugin::Entry(void) {
     if (dispatch_update.load()) {
       dispatch_update = false;
 
-      DispatchCorePayload();
+      DispatchLegacyPayload();
       DispatchStreamPayload();
 
       jagent_status.clear();
@@ -468,6 +468,7 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event,
   switch (event.event) {
     case ndPluginProcessor::EVENT_FLOW_MAP:
       encode_options |= ndFlow::ENCODE_STATS;
+      encode_options |= ndFlow::ENCODE_TUNNELS;
       break;
     case ndPluginProcessor::EVENT_FLOW_NEW:
     case ndPluginProcessor::EVENT_FLOW_UPDATED:
@@ -560,7 +561,7 @@ void nppPlugin::EncodeGlobalPacketStats(
   jiface_packet_stats = jo;
 }
 
-void nppPlugin::DispatchCorePayload(void) {
+void nppPlugin::DispatchLegacyPayload(void) {
   json jpayload(jagent_status);
   jpayload["version"] = _NPP_LEGACY_JSON_VERSION;
   jpayload["flows"] = jflows;
