@@ -125,7 +125,7 @@ void *nppPlugin::Entry(void) {
       "%s: %s v%s (C) 2021-2023 eGloo Incorporated.\n",
       tag.c_str(), PACKAGE_NAME, PACKAGE_VERSION);
 
-  while (!ShouldTerminate()) {
+  for (;;) {
     if (reload.load()) {
       Reload();
       reload = false;
@@ -149,6 +149,9 @@ void *nppPlugin::Entry(void) {
 
     if (flow_events.empty()) {
       Unlock();
+
+      if (flow_events_priv.empty() && ShouldTerminate())
+        break;
 
       if ((rc = pthread_mutex_lock(&cond_mutex)) != 0)
         throw ndThreadException(strerror(rc));
@@ -464,6 +467,8 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event,
 
   switch (event.event) {
     case ndPluginProcessor::EVENT_FLOW_MAP:
+      encode_options = ndFlow::ENCODE_STATS;
+      break;
     case ndPluginProcessor::EVENT_FLOW_NEW:
     case ndPluginProcessor::EVENT_FLOW_UPDATED:
       encode_options |= ndFlow::ENCODE_TUNNELS;
