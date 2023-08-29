@@ -1,7 +1,7 @@
 #!/bin/bash
 
 : ${COMPILER:=gcc}
-: ${CPPFLAGS:="-pipe -g -O1 -fexceptions -Wall"}
+: ${CPPFLAGS:="-pipe -g -O1 -std=gnu++11 -fexceptions -Wall"}
 : ${LDFLAGS:=}
 : ${VARIANT:=generic}
 : ${NETIFYD_PREFIX:=/tmp/netify-agent}
