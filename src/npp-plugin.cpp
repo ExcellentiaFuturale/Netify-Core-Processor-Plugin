@@ -227,6 +227,7 @@ void nppPlugin::DispatchProcessorEvent(
 
     for (auto &it : fm) {
       if (!it.second->flags.detection_init.load()) continue;
+      if (it.second->flags.expired.load()) continue;
       if (it.second->stats.lower_packets.load() == 0 &&
           it.second->stats.upper_packets.load() == 0)
         continue;
