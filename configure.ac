@@ -41,6 +41,7 @@ AX_CXX_COMPILE_STDCXX_11([ext], [optional])
 AS_IF([test "$HAVE_CXX11" = "0"], [AX_CXX_COMPILE_STDCXX_0X])
 
 # Checks for packages
+PKG_CHECK_MODULES([LIBCURL], [libcurl])
 PKG_CHECK_MODULES([LIBNETIFYD], [libnetifyd >= $NETIFY_MINVER],
     [ac_persistentstatedir=`$PKG_CONFIG --variable=persistentstatedir libnetifyd`;\
      ac_volatilestatedir=`$PKG_CONFIG --variable=volatilestatedir libnetifyd`],

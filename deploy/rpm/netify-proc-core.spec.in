@@ -16,6 +16,7 @@ BuildRequires: netifyd-devel >= @NETIFY_MINVER@
 BuildRequires: autoconf >= 2.63
 BuildRequires: automake
 BuildRequires: libtool
+BuildRequires: libcurl-devel
 Summary: Core Processor Plugin for the Netify Agent DPI Engine
 
 %description
