@@ -1,7 +1,7 @@
 # Netify Agent Core Processor Plugin
 
 AC_PREREQ([2.69])
-AC_INIT([Netify Core Processor Plugin], [1.0.18],
+AC_INIT([Netify Core Processor Plugin], [1.0.19],
     [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core/issues],
     [netify-proc-core],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
@@ -9,6 +9,7 @@ AC_CONFIG_SRCDIR([src/npp-plugin.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_USE_SYSTEM_EXTENSIONS
+AC_CANONICAL_HOST
 
 # Set the minimum Agent version this plugin requires.
 # When updating this version, remember to update .gitlab-ci.yml too.
@@ -37,15 +38,15 @@ AS_IF([test "x$ac_cv_path_uuidgen" != "xfalse"], [
 AC_DEFINE_UNQUOTED(NPP_BUILD_UUID, "${BUILD_UUID}", [Build UUID])
 
 # Check compiler flags (gnu++11)
-AX_CXX_COMPILE_STDCXX_11([ext], [optional])
-AS_IF([test "$HAVE_CXX11" = "0"], [AX_CXX_COMPILE_STDCXX_0X])
+AX_CXX_COMPILE_STDCXX_11
+AS_VAR_APPEND([CXXFLAGS], [" -std=gnu++11"])
 
 # Checks for packages
 PKG_CHECK_MODULES([LIBCURL], [libcurl])
 PKG_CHECK_MODULES([LIBNETIFYD], [libnetifyd >= $NETIFY_MINVER],
     [ac_persistentstatedir=`$PKG_CONFIG --variable=persistentstatedir libnetifyd`;\
      ac_volatilestatedir=`$PKG_CONFIG --variable=volatilestatedir libnetifyd`],
-    [ac_persistentstatedir=;ac_volatilestatedir=;]
+    [AC_MSG_ERROR([Netify Agent pkg-config not found])]
 )
 
 AS_IF([test "x$ac_persistentstatedir" = "x"],
@@ -72,10 +73,17 @@ AC_TYPE_SIZE_T
 if test -e ".git"; then :
     GIT_TAG=`git log -1 --format=%h`
     GIT_DATE=`git log -1 --format=%cd`
-    GIT_DATE_ISO8601=`git log -1 --format=%ci`
+    GIT_DATE_UNIX=`git log -1 --format=%ct`
 
     GIT_LAST_COMMIT_HASH=`git log -1 --format=%H`
-    GIT_LAST_COMMIT_DATE=`date -d "${GIT_DATE_ISO8601}" '+%F'`
+    case "${host_os}" in
+        linux*)
+            GIT_LAST_COMMIT_DATE=`date -d "@${GIT_DATE_UNIX}" '+%F'`
+        ;;
+    *)
+            GIT_LAST_COMMIT_DATE=`date -r "${GIT_DATE_UNIX}" '+%F'`
+        ;;
+    esac
 
     AC_SUBST([GIT_LAST_COMMIT_HASH], [$GIT_LAST_COMMIT_HASH])
     AC_SUBST([GIT_LAST_COMMIT_DATE], [$GIT_LAST_COMMIT_DATE])

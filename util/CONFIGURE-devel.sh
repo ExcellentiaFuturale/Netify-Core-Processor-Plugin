@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Example FreeBSD invocation:
+#   COMPILER=clang prefix=/usr/local libdir=/usr/local/lib sysconfdir=/usr/local/etc ./util/CONFIGURE-devel.sh
 
 : ${COMPILER:=gcc}
-: ${CPPFLAGS:="-pipe -g -O1 -std=gnu++11 -fexceptions -Wall"}
+: ${CPPFLAGS:="-pipe -g -O1 -fexceptions -Wall"}
 : ${LDFLAGS:=}
 : ${VARIANT:=generic}
 : ${NETIFYD_PREFIX:=/tmp/netify-agent}
