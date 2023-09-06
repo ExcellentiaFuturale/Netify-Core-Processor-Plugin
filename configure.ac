@@ -41,7 +41,7 @@ AC_DEFINE_UNQUOTED(NPP_BUILD_UUID, "${BUILD_UUID}", [Build UUID])
 AX_CXX_COMPILE_STDCXX_11
 AS_VAR_APPEND([CXXFLAGS], [" -std=gnu++11"])
 
-# Checks for packages
+# Checks for packages.
 PKG_CHECK_MODULES([LIBCURL], [libcurl])
 PKG_CHECK_MODULES([LIBNETIFYD], [libnetifyd >= $NETIFY_MINVER],
     [ac_persistentstatedir=`$PKG_CONFIG --variable=persistentstatedir libnetifyd`;\
