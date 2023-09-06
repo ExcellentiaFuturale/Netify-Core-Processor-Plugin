@@ -1,6 +1,10 @@
 {
     "format": "json",
     "compressor": "none",
+    "flow-filters": [
+      "proto == 'DHCP' or proto == 'DHCPv6';",
+      "proto == 'HTTP' or proto == 'SSDP';"
+    ],
     "sinks": {
         "sink-http": {
             "legacy": {

@@ -9,7 +9,8 @@
 #ifndef _NPP_PLUGIN_H
 #define _NPP_PLUGIN_H
 
-#include "nd-plugin.hpp"
+#include <nd-flow-parser.hpp>
+#include <nd-plugin.hpp>
 
 #define _NPP_LEGACY_JSON_VERSION 1.9
 
@@ -116,6 +117,10 @@ class nppPlugin : public ndPluginProcessor {
   vector<nppFlowEvent> flow_events;
   vector<nppFlowEvent> flow_events_priv;
 
+  ndFlowParser flow_parser;
+  typedef vector<string> FlowFilters;
+  FlowFilters flow_filters;
+
   virtual void DispatchPayload(
       nppChannelConfig::Type chan_type,
       const json &jpayload);
@@ -141,4 +146,3 @@ class nppPlugin : public ndPluginProcessor {
 };
 
 #endif  // _NPP_PLUGIN_H
-// vi: expandtab shiftwidth=4 softtabstop=4 tabstop=4

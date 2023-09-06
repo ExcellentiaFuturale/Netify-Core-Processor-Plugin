@@ -97,7 +97,7 @@ nppPlugin::nppPlugin(const string &tag,
 
   pthread_condattr_destroy(&cond_attr);
 
-  if ((rc = pthread_mutex_init(&cond_mutex, NULL)) != 0)
+  if ((rc = pthread_mutex_init(&cond_mutex, nullptr)) != 0)
     throw ndThreadException(strerror(rc));
 
   nd_dprintf("%s: initialized\n", tag.c_str());
@@ -181,8 +181,21 @@ void *nppPlugin::Entry(void) {
     Unlock();
 
     while (!flow_events_priv.empty()) {
-      json jpayload;
+      if (!flow_filters.empty()) {
+        bool match = false;
+        for (auto &expr : flow_filters) {
+          if ((match = flow_parser.Parse(
+                   flow_events_priv.back().flow, expr)))
+            break;
+        }
 
+        if (!match) {
+          flow_events_priv.pop_back();
+          continue;
+        }
+      }
+
+      json jpayload;
       EncodeFlow(flow_events_priv.back(), jpayload);
       flow_events_priv.pop_back();
 
@@ -195,7 +208,7 @@ void *nppPlugin::Entry(void) {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void nppPlugin::DispatchEvent(ndPlugin::Event event,
@@ -380,6 +393,12 @@ void nppPlugin::Reload(void) {
   sinks.clear();
 
   try {
+    auto jflow_filters = j.find("flow_filters");
+    if (jflow_filters != j.end() &&
+        jflow_filters->type() == json::value_t::array) {
+      flow_filters = jflow_filters->get<FlowFilters>();
+    }
+
     auto jsinks = j.find("sinks");
 
     if (jsinks != j.end()) {
@@ -625,5 +644,3 @@ void nppPlugin::DispatchStreamPayload(void) {
 }
 
 ndPluginInit(nppPlugin);
-
-// vi: expandtab shiftwidth=4 softtabstop=4 tabstop=4
