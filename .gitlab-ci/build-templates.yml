@@ -39,11 +39,10 @@
   stage: build
   image: $RPMOS_IMAGE
   before_script:
-    - apt update
-    - env DEBIAN_FRONTEND=noninteractive apt install -y git
+    - yum -y install git
   script:
     # Build environment
-    - yum -y install make rpm-build which expect yum-utils sudo autoconf gcc gcc-c++ automake libtool rsync bc git wget libcurl-devel
+    - yum -y install make rpm-build which expect yum-utils sudo autoconf gcc gcc-c++ automake libtool rsync bc wget libcurl-devel
     - wget --no-check-certificate https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RPMOS_VERSION}.noarch.rpm
     - yum -y install epel-release-latest-${RPMOS_VERSION}.noarch.rpm
     - wget --no-check-certificate https://download.netify.ai/netify/$RPMOS_OS/$RPMOS_VERSION/devel/$RPMOS_ARCH/netifyd-${NETIFY_MINVER}.os${RPMOS_VERSION}.x86_64.rpm
