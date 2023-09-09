@@ -6,10 +6,10 @@
   image: $OS_IMAGE
   before_script:
     # Manually pull in submodules, the GIT_SUBMODULE_STRATEGY variable in GitLab is quirky
+    - ls -l m4
     - apt update
     - env DEBIAN_FRONTEND=noninteractive apt install -y git
     - git submodule sync --recursive
-    - ls -l m4
     - git submodule update --init --recursive
     - find . -name '\.git*' -print0 | xargs -0 rm -rf
   script:
