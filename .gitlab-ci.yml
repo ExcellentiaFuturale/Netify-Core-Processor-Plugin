@@ -8,9 +8,11 @@ stages:
 # Incude templates
 include:
   - '/.gitlab-ci/build-templates.yml'
+  - '/.gitlab-ci/package-templates.yml'
 
 variables:
   NETIFY_MINVER: "4.5.24-1"
+  GIT_SUBMODULE_STRATEGY: recursive
 
 # -------------------------------------------------------------------------
 # Build stage
@@ -101,4 +103,20 @@ almalinux 8 build:
     RPMOS_VERSION: "8"
     RPMOS_ARCH: "x86_64"
     RPMOS_REPOS: "--enablerepo=powertools,epel"
+
+# -------------------------------------------------------------------------
+# Package stage
+# -------------------------------------------------------------------------
+#
+package source:
+  extends: .pkg_source
+  tags:
+    - docker
+  variables:
+    OS_IMAGE: "debian:11"
+    OS_NAME: "debian"
+    OS_VERSION: "11"
+    OS_ARCH: "amd64"
+    OS_EXTRA_PACKAGES: ""
+  needs: ["debian 11 build"]
 
