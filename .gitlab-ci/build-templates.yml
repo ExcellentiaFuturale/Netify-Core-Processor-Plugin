@@ -45,6 +45,7 @@
 .rpmos_build:
   stage: build
   image: $RPMOS_IMAGE
+  before_script:
     # Manually pull in submodules, the GIT_SUBMODULE_STRATEGY variable in GitLab is quirky
     - rm -rf m4/*
     - apt update
