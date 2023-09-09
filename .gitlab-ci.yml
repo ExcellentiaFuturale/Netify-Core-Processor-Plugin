@@ -13,6 +13,7 @@ include:
 
 variables:
   NETIFY_MINVER: "4.5.24-1"
+  GIT_SUBMODULE_STRATEGY: recursive
 
 # -------------------------------------------------------------------------
 # Build stage
@@ -42,7 +43,6 @@ debian 11 build:
     OS_VERSION: "11"
     OS_ARCH: "amd64"
     OS_ARCH_PATH: "amd64"
-    GIT_SUBMODULE_STRATEGY: normal
 
 # Ubuntu OS Targets
 #------------------
@@ -68,7 +68,6 @@ ubuntu 22.04 build:
     OS_VERSION: "jammy"
     OS_ARCH: "amd64"
     OS_ARCH_PATH: "binary-amd64"
-    GIT_SUBMODULE_STRATEGY: normal
 
 # RPM OS Targets
 #---------------
@@ -94,7 +93,6 @@ rockylinux 8 build:
     RPMOS_VERSION: "8"
     RPMOS_ARCH: "x86_64"
     RPMOS_REPOS: "--enablerepo=powertools,epel"
-    GIT_SUBMODULE_STRATEGY: normal
 
 almalinux 8 build:
   extends: .rpmos_build
