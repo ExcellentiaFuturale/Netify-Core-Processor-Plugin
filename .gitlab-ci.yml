@@ -4,8 +4,9 @@
 
 stages:
   - build
+  - package
 
-# Incude templates
+# Include templates
 include:
   - '/.gitlab-ci/build-templates.yml'
   - '/.gitlab-ci/package-templates.yml'
