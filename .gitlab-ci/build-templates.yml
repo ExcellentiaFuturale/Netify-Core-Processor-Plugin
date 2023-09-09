@@ -5,15 +5,8 @@
   stage: build
   image: $OS_IMAGE
   before_script:
-    # Manually pull in submodules, the GIT_SUBMODULE_STRATEGY variable in GitLab is quirky
     - apt update
     - env DEBIAN_FRONTEND=noninteractive apt install -y git
-    - find .
-    - git log
-    - git submodule sync --recursive
-    - git submodule update --init --recursive
-    - find .
-    - find . -name '\.git*' -print0 | xargs -0 rm -rf
   script:
     # Build environment
     - env DEBIAN_FRONTEND=noninteractive apt install -y rsync debhelper autoconf automake bc build-essential libmnl-dev libnetfilter-conntrack-dev libtool wget pkg-config libcurl4-openssl-dev
@@ -46,13 +39,8 @@
   stage: build
   image: $RPMOS_IMAGE
   before_script:
-    # Manually pull in submodules, the GIT_SUBMODULE_STRATEGY variable in GitLab is quirky
-    - rm -rf m4/*
     - apt update
     - env DEBIAN_FRONTEND=noninteractive apt install -y git
-    - git submodule sync --recursive
-    - git submodule update --init --recursive
-    - find . -name '\.git*' -print0 | xargs -0 rm -rf
   script:
     # Build environment
     - yum -y install make rpm-build which expect yum-utils sudo autoconf gcc gcc-c++ automake libtool rsync bc git wget libcurl-devel
