@@ -1,7 +1,9 @@
+*.distinfo
 *.gz
 *.la
 *.lo
 *.o
+*.sum
 *~
 .deps/
 .libs/

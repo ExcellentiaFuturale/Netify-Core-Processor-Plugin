@@ -1,0 +1,3 @@
+The core processor plugin encodes flow events and Agent status updates into various output formats such as JSON or MSGPACK.
+
+WWW: https://netify.ai/

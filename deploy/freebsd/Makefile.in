@@ -1,0 +1,48 @@
+# $FreeBSD$
+
+PORTNAME=@PACKAGE_TARNAME@
+PORTVERSION=@PACKAGE_VERSION@
+PORTEPOCH=1
+CATEGORIES=security
+MAINTAINER=team@netify.ai
+COMMENT=Netify Core Processor Plugin for the Netify Agent
+WWW=https://netify.ai/
+MASTER_SITES=http://download.netify.ai/netify/source/
+LICENSE=GPLv3+
+LICENSE_FILE=${WRKSRC}/LICENSE
+
+LIB_DEPENDS=\
+	libcurl.so:ftp/curl \
+	libnetifyd.so:security/netifyd
+
+USES=\
+	autoreconf \
+	compiler:c++11-lang \
+	gmake \
+	libtool \
+	localbase:ldflags \
+	pathfix \
+	pkgconfig
+
+USE_LDCONFIG=yes
+
+OPTIONS_DEFINE=MAKE_JOBS
+OPTIONS_DEFAULT=MAKE_JOBS
+OPTIONS_SUB=yes
+
+MAKE_JOBS_DESC=Enable parallel build
+MAKE_JOBS_VARS_OFF=MAKE_JOBS_UNSAFE=yes
+
+SUB_LIST=PACKAGE_TARNAME=@PACKAGE_TARNAME@
+
+GNU_CONFIGURE=yes
+
+INSTALL_TARGET=install-strip
+
+ETCDIR=${PREFIX}/etc/netifyd
+
+post-install:
+	${MKDIR} ${STAGEDIR}${ETCDIR}
+	${MV} ${WRKSRC}/deploy/@PACKAGE_TARNAME@.json ${STAGEDIR}${ETCDIR}/@PACKAGE_TARNAME@.json.sample
+
+.include <bsd.port.mk>

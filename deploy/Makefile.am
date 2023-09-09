@@ -8,3 +8,4 @@ SUBDIRS = debian plugins.d rpm
 sharedatadir = $(sysconfdir)/netifyd
 sharedata_DATA = $(PACKAGE_TARNAME).json
 
+EXTRA_DIST = freebsd

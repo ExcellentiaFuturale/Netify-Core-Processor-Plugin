@@ -7,10 +7,6 @@ SUBDIRS = src deploy
 
 EXTRA_DIST = autogen.sh include
 
-deploy-debug: all
-	rsync -avl --progress --inplace src/.libs/libnetify*.so* $(DEBUG_HOST):/usr/lib64/
-
-deploy-rpm:
-	$(MAKE) dist-gzip
-	cp -v $(PACKAGE)-$(VERSION).tar.gz ~/rpmbuild/SOURCES/
-	rpmbuild -ba $(PACKAGE).spec
+include $(abs_top_srcdir)/automake/dist-git.am
+include $(abs_top_srcdir)/automake/deploy-rpm.am
+include $(abs_top_srcdir)/automake/deploy-debug.am
