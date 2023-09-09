@@ -9,11 +9,11 @@
     - apt update
     - env DEBIAN_FRONTEND=noninteractive apt install -y git
     - git submodule sync --recursive
+    - ls -l m4
     - git submodule update --init --recursive
     - find . -name '\.git*' -print0 | xargs -0 rm -rf
   script:
     # Build environment
-    - apt update
     - env DEBIAN_FRONTEND=noninteractive apt install -y rsync debhelper autoconf automake bc build-essential libmnl-dev libnetfilter-conntrack-dev libtool wget pkg-config libcurl4-openssl-dev
     - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH_PATH/netifyd_${NETIFY_MINVER}_${OS_ARCH}.deb
     - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH_PATH/netifyd-dev_${NETIFY_MINVER}_${OS_ARCH}.deb
