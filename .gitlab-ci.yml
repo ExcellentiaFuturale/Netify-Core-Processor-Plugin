@@ -11,13 +11,13 @@ include:
   - project: 'netify.ai/public/netify-development-support/netify-ci-templates'
     ref: master
     file:
-      - '/plugin/build-templates.yml'
-      - '/common/package-templates.yml'
+      - '/gitlab/plugin/build-templates.yml'
+      - '/gitlab/common/package-templates.yml'
   - project: 'public/netify-development-support/netify-ci-templates'
     ref: master
     file:
-      - '/plugin/build-templates.yml'
-      - '/common/package-templates.yml'
+      - '/gitlab/plugin/build-templates.yml'
+      - '/gitlab/common/package-templates.yml'
 
 variables:
   PACKAGE_NAME: netify-proc-core
