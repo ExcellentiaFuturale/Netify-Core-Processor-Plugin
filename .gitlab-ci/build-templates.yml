@@ -62,10 +62,10 @@
     - ./autogen.sh
     - ./configure --prefix=/usr --includedir=\${prefix}/include --mandir=\${prefix}/share/man --sysconfdir=/etc --localstatedir=/var
     - make -C deploy/rpm
-    - grep ^Version deploy/rpm/PACKAGE_NAME.spec | sed 's/.*[[:space:]]//' > /tmp/version
-    - tar --exclude=.git --transform "s,^,PACKAGE_NAME-`cat /tmp/version`/," -czf PACKAGE_NAME-`cat /tmp/version`.tar.gz *
+    - grep ^Version deploy/rpm/${PACKAGE_NAME}.spec | sed 's/.*[[:space:]]//' > /tmp/version
+    - tar --exclude=.git --transform "s,^,${PACKAGE_NAME}-`cat /tmp/version`/," -czf ${PACKAGE_NAME}-`cat /tmp/version`.tar.gz *
     - echo "%dist .os${OS_VERSION}" > ~/.rpmmacros
-    - rpmbuild -bs deploy/rpm/PACKAGE_NAME.spec --define "_sourcedir $PWD" --define "_srcrpmdir $PWD"
+    - rpmbuild -bs deploy/rpm/${PACKAGE_NAME}.spec --define "_sourcedir $PWD" --define "_srcrpmdir $PWD"
     - rpmbuild --rebuild *.src.rpm
 
     # Copy artifacts (packages) to mirror

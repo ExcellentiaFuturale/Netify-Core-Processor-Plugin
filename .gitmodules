@@ -4,3 +4,7 @@
 [submodule "automake"]
 	path = automake
 	url = https://gitlab.com/netify.ai/public/netify-automake-includes.git
+[submodule "automake/"]
+	url = https://gitlab.com/netify.ai/public/netify-development-support/netify-automake.git
+[submodule "m4/"]
+	url = https://gitlab.com/netify.ai/public/netify-development-support/netify-autoconf.git
