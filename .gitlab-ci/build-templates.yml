@@ -4,28 +4,34 @@
 .debian_build:
   stage: build
   image: $OS_IMAGE
+
   before_script:
     - apt update
     - env DEBIAN_FRONTEND=noninteractive apt install -y git
+
   script:
     # Build environment
     - env DEBIAN_FRONTEND=noninteractive apt install -y rsync debhelper autoconf automake bc build-essential libmnl-dev libnetfilter-conntrack-dev libtool wget pkg-config libcurl4-openssl-dev
-    - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH_PATH/netifyd_${NETIFY_MINVER}_${OS_ARCH}.deb
-    - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH_PATH/netifyd-dev_${NETIFY_MINVER}_${OS_ARCH}.deb
+    - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH/netifyd_${NETIFY_MINVER}_${OS_ARCH}.deb
+    - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION-devel/$OS_ARCH/netifyd-dev_${NETIFY_MINVER}_${OS_ARCH}.deb
     - env DEBIAN_FRONTEND=noninteractive apt install -y ./netifyd_${NETIFY_MINVER}_${OS_ARCH}.deb ./netifyd-dev_${NETIFY_MINVER}_${OS_ARCH}.deb
+
     # Build packages
     - ./autogen.sh
     - ./configure --prefix=/usr --includedir=\${prefix}/include --mandir=\${prefix}/share/man --sysconfdir=/etc --localstatedir=/var
     - make -C deploy/debian
     - cp -av deploy/debian .
     - dpkg-buildpackage -b
+
     # Copy packages to mirror
-    - mkdir -p builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH_PATH
-    - mv -v ../*.deb builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH_PATH
-    - mv -v ../*.changes builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH_PATH
-    - mv -v ../*.buildinfo builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH_PATH
+    - mkdir -p builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH
+    - mv -v ../*.deb builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH
+    - mv -v ../*.changes builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH
+    - mv -v ../*.buildinfo builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH
+
     # Push build to master node
     - rsync -rtv builds/* master-mirror.netify-backend.gcp::netify/builds/${CI_COMMIT_REF_NAME}/
+
   artifacts:
     when: always
     paths:
@@ -37,32 +43,38 @@
 
 .rpmos_build:
   stage: build
-  image: $RPMOS_IMAGE
+  image: $OS_IMAGE
+
   before_script:
     - yum -y install git
+
   script:
     # Build environment
     - yum -y install make rpm-build which expect yum-utils sudo autoconf gcc gcc-c++ automake libtool rsync bc wget libcurl-devel
-    - wget --no-check-certificate https://dl.fedoraproject.org/pub/epel/epel-release-latest-${RPMOS_VERSION}.noarch.rpm
-    - yum -y install epel-release-latest-${RPMOS_VERSION}.noarch.rpm
-    - wget --no-check-certificate https://download.netify.ai/netify/$RPMOS_OS/$RPMOS_VERSION/devel/$RPMOS_ARCH/netifyd-${NETIFY_MINVER}.os${RPMOS_VERSION}.x86_64.rpm
-    - wget --no-check-certificate https://download.netify.ai/netify/$RPMOS_OS/$RPMOS_VERSION/devel/$RPMOS_ARCH/netifyd-devel-${NETIFY_MINVER}.os${RPMOS_VERSION}.x86_64.rpm
-    - yum -y localinstall $RPMOS_REPOS netifyd*.rpm
-    - yum -y install $RPMOS_REPOS libmnl-devel libnetfilter_conntrack-devel
+    - wget --no-check-certificate https://dl.fedoraproject.org/pub/epel/epel-release-latest-${OS_VERSION}.noarch.rpm
+    - yum -y install epel-release-latest-${OS_VERSION}.noarch.rpm
+    - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION/devel/$OS_ARCH/netifyd-${NETIFY_MINVER}.os${OS_VERSION}.x86_64.rpm
+    - wget --no-check-certificate https://download.netify.ai/netify/$OS_NAME/$OS_VERSION/devel/$OS_ARCH/netifyd-devel-${NETIFY_MINVER}.os${OS_VERSION}.x86_64.rpm
+    - yum -y localinstall $OS_REPOS netifyd*.rpm
+    - yum -y install $OS_REPOS libmnl-devel libnetfilter_conntrack-devel
+
     # Build packages
     - ./autogen.sh
     - ./configure --prefix=/usr --includedir=\${prefix}/include --mandir=\${prefix}/share/man --sysconfdir=/etc --localstatedir=/var
     - make -C deploy/rpm
-    - grep ^Version deploy/rpm/netify-proc-core.spec | sed 's/.*[[:space:]]//' > /tmp/version
-    - tar --exclude=.git --transform "s,^,netify-proc-core-`cat /tmp/version`/," -czf netify-proc-core-`cat /tmp/version`.tar.gz *
-    - echo "%dist .os${RPMOS_VERSION}" > ~/.rpmmacros
-    - rpmbuild -bs deploy/rpm/netify-proc-core.spec --define "_sourcedir $PWD" --define "_srcrpmdir $PWD"
+    - grep ^Version deploy/rpm/PACKAGE_NAME.spec | sed 's/.*[[:space:]]//' > /tmp/version
+    - tar --exclude=.git --transform "s,^,PACKAGE_NAME-`cat /tmp/version`/," -czf PACKAGE_NAME-`cat /tmp/version`.tar.gz *
+    - echo "%dist .os${OS_VERSION}" > ~/.rpmmacros
+    - rpmbuild -bs deploy/rpm/PACKAGE_NAME.spec --define "_sourcedir $PWD" --define "_srcrpmdir $PWD"
     - rpmbuild --rebuild *.src.rpm
+
     # Copy artifacts (packages) to mirror
-    - mkdir -p builds/$CI_PROJECT_NAME/$RPMOS_OS/$RPMOS_VERSION/$RPMOS_ARCH
-    - mv -v ~/rpmbuild/RPMS/$RPMOS_ARCH/*.rpm builds/$CI_PROJECT_NAME/$RPMOS_OS/$RPMOS_VERSION/$RPMOS_ARCH/
+    - mkdir -p builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH
+    - mv -v ~/rpmbuild/RPMS/$OS_ARCH/*.rpm builds/$CI_PROJECT_NAME/$OS_NAME/$OS_VERSION/$OS_ARCH/
+
     # Push build to master node
     - rsync -rtv builds/* master-mirror.netify-backend.gcp::netify/builds/${CI_COMMIT_REF_NAME}/
+
   artifacts:
     when: always
     paths:
