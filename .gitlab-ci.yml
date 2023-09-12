@@ -13,11 +13,6 @@ include:
     file:
       - '/gitlab/plugins/build-templates.yml'
       - '/gitlab/common/package-templates.yml'
-  - project: 'public/netify-development-support/netify-ci-templates'
-    ref: master
-    file:
-      - '/gitlab/plugins/build-templates.yml'
-      - '/gitlab/common/package-templates.yml'
 
 variables:
   PACKAGE_NAME: netify-proc-core
