@@ -8,7 +8,7 @@ stages:
 
 # Include templates
 include:
-  - project: 'netify.ai/public/netify-development-support/netify-ci-templates'
+  - project: 'public/netify-development-support/netify-ci-templates'
     file:
       - '/plugin/build-templates.yml'
       - '/common/package-templates.yml'
