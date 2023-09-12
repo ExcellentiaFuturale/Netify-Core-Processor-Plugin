@@ -8,8 +8,10 @@ stages:
 
 # Include templates
 include:
-  - '/.gitlab-ci/build-templates.yml'
-  - '/.gitlab-ci/package-templates.yml'
+  - project '/netify.ai/public/netify-development-support/netify-ci-templates'
+    file:
+      - '/plugin/build-templates.yml'
+      - '/common/package-templates.yml'
 
 variables:
   PACKAGE_NAME: netify-proc-core
