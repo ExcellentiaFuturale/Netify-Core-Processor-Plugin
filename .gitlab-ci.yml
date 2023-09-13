@@ -8,11 +8,12 @@ stages:
 
 # Include templates
 include:
-  - project: 'netify.ai/public/netify-development-support/netify-ci-templates'
+  - project: netify.ai/public/netify-development-support/\
+    netify-ci-templates
     ref: master
     file:
-      - '/gitlab/plugins/build-templates.yml'
-      - '/gitlab/common/package-templates.yml'
+      - /gitlab/plugins/build-templates.yml
+      - /gitlab/common/package-templates.yml
 
 variables:
   PACKAGE_NAME: netify-proc-core
@@ -34,6 +35,10 @@ debian 10 build:
     OS_NAME: "debian"
     OS_VERSION: "10"
     OS_ARCH: "amd64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
+    OS_EXTRA_PACKAGES: ""
 
 debian 11 build:
   extends: .debian_build
@@ -44,6 +49,10 @@ debian 11 build:
     OS_NAME: "debian"
     OS_VERSION: "11"
     OS_ARCH: "amd64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
+    OS_EXTRA_PACKAGES: ""
 
 # Ubuntu OS Targets
 
@@ -55,7 +64,11 @@ ubuntu 20.04 build:
     OS_IMAGE: "ubuntu:20.04"
     OS_NAME: "ubuntu"
     OS_VERSION: "focal"
-    OS_ARCH: "binary-amd64"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH:
+      value: "binary-$OS_ARCH"
+      expand: true
+    OS_EXTRA_PACKAGES: ""
 
 ubuntu 22.04 build:
   extends: .debian_build
@@ -65,7 +78,11 @@ ubuntu 22.04 build:
     OS_IMAGE: "ubuntu:22.04"
     OS_NAME: "ubuntu"
     OS_VERSION: "jammy"
-    OS_ARCH: "binary-amd64"
+    OS_ARCH: "amd64"
+    OS_ARCH_PATH:
+      value: "binary-$OS_ARCH"
+      expand: true
+    OS_EXTRA_PACKAGES: ""
 
 # RPM OS Targets
 
@@ -79,6 +96,7 @@ centos 7 build:
     OS_VERSION: "7"
     OS_ARCH: "x86_64"
     OS_REPOS: ""
+    OS_EXTRA_PACKAGES: ""
 
 rockylinux 8 build:
   extends: .rpmos_build
@@ -90,6 +108,7 @@ rockylinux 8 build:
     OS_VERSION: "8"
     OS_ARCH: "x86_64"
     OS_REPOS: "--enablerepo=powertools,epel"
+    OS_EXTRA_PACKAGES: ""
 
 almalinux 8 build:
   extends: .rpmos_build
@@ -101,6 +120,7 @@ almalinux 8 build:
     OS_VERSION: "8"
     OS_ARCH: "x86_64"
     OS_REPOS: "--enablerepo=powertools,epel"
+    OS_EXTRA_PACKAGES: ""
 
 # ------------------------------------------------------------
 # Package stage
