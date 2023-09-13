@@ -8,8 +8,8 @@ stages:
 
 # Include templates
 include:
-  - project: netify.ai/public/netify-development-support/\
-    netify-ci-templates
+  - project: 'netify.ai/public/netify-development-support/
+      netify-ci-templates'
     ref: master
     file:
       - /gitlab/plugins/build-templates.yml
