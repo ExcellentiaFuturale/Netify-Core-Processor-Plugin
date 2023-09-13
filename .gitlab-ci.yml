@@ -3,8 +3,8 @@
 # -----------------------------------------------------------
 
 stages:
-  - build
-  - package
+  - Build
+  - Package
 
 include:
   - project: "netify.ai/public/netify-development-support/\
