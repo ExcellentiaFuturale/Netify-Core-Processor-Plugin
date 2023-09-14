@@ -4,7 +4,7 @@
 
 stages:
   - Build
-  - Package
+  - Variants
 
 include:
   - project: "netify.ai/public/netify-development-support/\
@@ -12,7 +12,7 @@ include:
     ref: master
     file:
       - /gitlab/plugins/build-templates.yml
-      - /gitlab/common/package-templates.yml
+      - /gitlab/common/variants-templates.yml
 
 variables:
   PACKAGE_NAME: netify-proc-core
