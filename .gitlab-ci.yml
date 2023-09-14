@@ -20,10 +20,10 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 # -----------------------------------------------------------
-# Build stage
+# Build
 # -----------------------------------------------------------
 
-# Debian OS Targets
+# Debian Targets
 
 Debian/10/x86-64:
   extends: .debian_build
@@ -53,7 +53,7 @@ Debian/11/x86-64:
       expand: true
     OS_EXTRA_PACKAGES: ""
 
-# Ubuntu OS Targets
+# Ubuntu Targets
 
 Ubuntu/20.04/x86-64:
   extends: .debian_build
@@ -83,7 +83,7 @@ Ubuntu/22.04/x86-64:
       expand: true
     OS_EXTRA_PACKAGES: ""
 
-# RPM OS Targets
+# RedHat Targets
 
 CentOS/7/x86-64:
   extends: .rpmos_build
@@ -122,7 +122,7 @@ AlmaLinux/8/x86-64:
     OS_EXTRA_PACKAGES: ""
 
 # -----------------------------------------------------------
-# Package stage
+# Variants
 # -----------------------------------------------------------
 
 Source Archive:
