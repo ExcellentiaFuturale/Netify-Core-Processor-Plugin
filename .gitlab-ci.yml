@@ -133,7 +133,7 @@ Source Archive:
     OS_NAME: "debian"
     OS_VERSION: "11"
     OS_IMAGE: "debian:11"
-    OS_ARCH: "binary-amd64"
+    OS_ARCH: "amd64"
     OS_EXTRA_PACKAGES: ""
   needs: ["Debian/11/x86-64"]
 
