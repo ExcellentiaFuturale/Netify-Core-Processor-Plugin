@@ -21,9 +21,11 @@ variables:
   EXTRA_PACKAGES_APT: >
     libcurl4-openssl-dev
     libmnl-dev
+    libnetfilter-conntrack-dev
   EXTRA_PACKAGES_YUM: >
     curl-devel
     libmnl-devel
+    libnetfilter_conntrack-devel
 
 # -----------------------------------------------------------
 # Build
