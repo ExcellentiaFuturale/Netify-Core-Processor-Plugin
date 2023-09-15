@@ -11,6 +11,10 @@ include:
               netify-ci-templates"
     ref: master
     file:
+      - /gitlab/plugins/global-variables.yml
+      - /gitlab/plugins/common-base-packages.yml
+      - /gitlab/plugins/debian-base-packages.yml
+      - /gitlab/plugins/rhel-base-packages.yml
       - /gitlab/plugins/build-templates.yml
       - /gitlab/common/variants-templates.yml
 
