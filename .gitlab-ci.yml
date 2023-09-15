@@ -20,8 +20,10 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   EXTRA_PACKAGES_APT: >
     libcurl4-openssl-dev
+    libmnl-dev
   EXTRA_PACKAGES_YUM: >
     curl-devel
+    libmnl-devel
 
 # -----------------------------------------------------------
 # Build
@@ -149,7 +151,7 @@ Source Archive:
   extends: .pkg_source
   tags:
     - docker
-  needs: 
+  needs:
     - Debian/11/x86-64
   variables:
     OS_NAME: "debian"
