@@ -19,7 +19,6 @@ include:
       - /gitlab/common/variants-templates.yml
 
 variables:
-  PACKAGE_NAME: netify-proc-core
   NETIFY_MINVER: "4.5.27-1"
   GIT_SUBMODULE_STRATEGY: recursive
   EXTRA_PACKAGES_APT: >
