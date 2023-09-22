@@ -20,7 +20,7 @@ include:
 
 variables:
   PACKAGE_NAME: netify-proc-core
-  NETIFY_MINVER: "4.5.24-1"
+  NETIFY_MINVER: "4.5.27-1"
   GIT_SUBMODULE_STRATEGY: recursive
   EXTRA_PACKAGES_APT: >
     libcurl4-openssl-dev

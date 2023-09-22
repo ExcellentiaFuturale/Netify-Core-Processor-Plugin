@@ -6,7 +6,7 @@ m4_include([m4/ax_git_vars.m4])
 m4_include([m4/ax_check_progs.m4])
 
 AC_PREREQ([2.69])
-AC_INIT([Netify Core Processor Plugin], [1.0.20],
+AC_INIT([Netify Core Processor Plugin], [1.0.21],
     [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core/issues],
     [netify-proc-core],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
@@ -18,7 +18,7 @@ AC_CANONICAL_HOST
 
 # Set the minimum Agent version this plugin requires.
 # When updating this version, remember to update .gitlab-ci.yml too.
-NETIFY_MINVER=4.5.24
+NETIFY_MINVER=4.5.27
 AC_SUBST([NETIFY_MINVER], [$NETIFY_MINVER])
 
 # Checks for programs.
