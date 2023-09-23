@@ -11,7 +11,7 @@ include:
               netify-ci-templates"
     ref: master
     file:
-      - /gitlab/plugins/global-variables.yml
+      - /gitlab/common/global-variables.yml
       - /gitlab/plugins/common-base-packages.yml
       - /gitlab/plugins/debian-base-packages.yml
       - /gitlab/plugins/rhel-base-packages.yml
@@ -19,7 +19,7 @@ include:
       - /gitlab/common/variants-templates.yml
 
 variables:
-  NETIFY_MINVER: "4.5.27-1"
+  NETIFY_MINVER: "5.0.0-1"
   GIT_SUBMODULE_STRATEGY: recursive
   EXTRA_PACKAGES_APT: >
     libcurl4-openssl-dev
@@ -105,7 +105,7 @@ Ubuntu/22.04/x86-64:
 # RedHat Targets
 
 CentOS/7/x86-64:
-  extends: .rpmos_build
+  extends: .rhel_build
   tags:
     - docker
   variables:
@@ -119,7 +119,7 @@ CentOS/7/x86-64:
       expand: true
 
 Rocky Linux/8/x86-64:
-  extends: .rpmos_build
+  extends: .rhel_build
   tags:
     - docker
   variables:
@@ -133,7 +133,7 @@ Rocky Linux/8/x86-64:
       expand: true
 
 AlmaLinux/8/x86-64:
-  extends: .rpmos_build
+  extends: .rhel_build
   tags:
     - docker
   variables:
