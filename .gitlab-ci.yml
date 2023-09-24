@@ -116,6 +116,9 @@ CentOS/7/x86-64:
     OS_VERSION: "7"
     OS_IMAGE: "centos:7.9.2009"
     OS_ARCH: "x86_64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
     OS_REPOS: ""
     OS_EXTRA_PACKAGES:
       value: $EXTRA_PACKAGES_YUM
@@ -130,6 +133,9 @@ Rocky Linux/8/x86-64:
     OS_VERSION: "8"
     OS_IMAGE: "rockylinux:8"
     OS_ARCH: "x86_64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
     OS_REPOS: "--enablerepo=powertools,epel"
     OS_EXTRA_PACKAGES:
       value: $EXTRA_PACKAGES_YUM
@@ -144,6 +150,9 @@ AlmaLinux/8/x86-64:
     OS_VERSION: "8"
     OS_IMAGE: "almalinux:8"
     OS_ARCH: "x86_64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
     OS_REPOS: "--enablerepo=powertools,epel"
     OS_EXTRA_PACKAGES:
       value: $EXTRA_PACKAGES_YUM
@@ -166,6 +175,9 @@ Source Archive:
     OS_VERSION: "11"
     OS_IMAGE: "debian:11"
     OS_ARCH: "amd64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
     OS_EXTRA_PACKAGES:
       value: $EXTRA_PACKAGES_APT
       expand: true
