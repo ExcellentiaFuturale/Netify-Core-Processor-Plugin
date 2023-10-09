@@ -109,6 +109,7 @@ Ubuntu/22.04/x86-64:
 
 CentOS/7/x86-64:
   extends: .rhel_build
+  when: manual
   tags:
     - docker
   variables:
