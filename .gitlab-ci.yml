@@ -71,6 +71,73 @@ Debian/11/x86-64:
       value: $EXTRA_PACKAGES_APT
       expand: true
 
+Debian/11/x86-32:
+  extends: .debian_build
+  tags:
+    - docker
+  variables:
+    OS_NAME: "debian"
+    OS_VERSION: "11"
+    OS_IMAGE: "i386/debian:11"
+    OS_ARCH: i386
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
+    OS_EXTRA_PACKAGES:
+      value: $EXTRA_PACKAGES_APT
+      expand: true
+
+Debian/11/ARM-32v5:
+  extends: .debian_build
+  when: manual
+  tags:
+    - docker
+  variables:
+    OS_NAME: "debian"
+    OS_VERSION: "11"
+    OS_IMAGE: "arm32v5/debian:11"
+    OS_ARCH: "armel"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
+    OS_EXTRA_PACKAGES:
+      value: $EXTRA_PACKAGES_APT
+      expand: true
+
+Debian/11/ARM-32v7:
+  extends: .debian_build
+  when: manual
+  tags:
+    - docker
+  variables:
+    OS_NAME: "debian"
+    OS_VERSION: "11"
+    OS_IMAGE: "arm32v7/debian:11"
+    OS_ARCH: "armhf"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
+    OS_EXTRA_PACKAGES:
+      value: $EXTRA_PACKAGES_APT
+      expand: true
+
+Debian/11/ARM-64v8:
+  extends: .debian_build
+  when: manual
+  tags:
+    - docker
+  variables:
+    OS_NAME: "debian"
+    OS_VERSION: "11"
+    OS_IMAGE: "arm64v8/debian:11"
+    OS_ARCH: "arm64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
+    OS_EXTRA_PACKAGES:
+      value: $EXTRA_PACKAGES_APT
+      expand: true
+
 # Ubuntu Targets
 
 Ubuntu/20.04/x86-64:
@@ -155,6 +222,23 @@ AlmaLinux/8/x86-64:
       value: $OS_ARCH
       expand: true
     OS_REPOS: "--enablerepo=powertools,epel"
+    OS_EXTRA_PACKAGES:
+      value: $EXTRA_PACKAGES_YUM
+      expand: true
+
+AlmaLinux/9/x86-64:
+  extends: .rhel_build
+  tags:
+    - docker
+  variables:
+    OS_NAME: "almalinux"
+    OS_VERSION: "9"
+    OS_IMAGE: "almalinux:9"
+    OS_ARCH: "x86_64"
+    OS_ARCH_PATH:
+      value: $OS_ARCH
+      expand: true
+    OS_REPOS: "--enablerepo=crb"
     OS_EXTRA_PACKAGES:
       value: $EXTRA_PACKAGES_YUM
       expand: true
