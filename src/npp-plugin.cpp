@@ -122,7 +122,7 @@ void *nppPlugin::Entry(void) {
     int rc;
 
     nd_printf(
-      "%s: %s v%s (C) 2021-2023 eGloo Incorporated.\n",
+      "%s: %s v%s Copyright (C) 2021-2023 eGloo Incorporated.\n",
       tag.c_str(), PACKAGE_NAME, PACKAGE_VERSION);
 
     for (;;) {
