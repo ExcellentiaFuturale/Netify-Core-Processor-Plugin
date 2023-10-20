@@ -122,7 +122,8 @@ void *nppPlugin::Entry(void) {
     int rc;
 
     nd_printf(
-      "%s: %s v%s Copyright (C) 2021-2023 eGloo Incorporated.\n",
+      "%s: %s v%s Copyright (C) 2021-2023 eGloo "
+      "Incorporated.\n",
       tag.c_str(), PACKAGE_NAME, PACKAGE_VERSION);
 
     for (;;) {
@@ -189,9 +190,10 @@ void *nppPlugin::Entry(void) {
                         if ((match = flow_parser.Parse(
                                flow_events_priv.back().flow, expr)))
                             break;
-                    } catch (string &e) {
-                        nd_dprintf("%s: %s: %s\n",
-                            tag.c_str(), expr.c_str(), e.c_str());
+                    }
+                    catch (string &e) {
+                        nd_dprintf("%s: %s: %s\n", tag.c_str(),
+                          expr.c_str(), e.c_str());
                     }
                 }
 
