@@ -185,9 +185,14 @@ void *nppPlugin::Entry(void) {
             if (! flow_filters.empty()) {
                 bool match = false;
                 for (auto &expr : flow_filters) {
-                    if ((match = flow_parser.Parse(
-                           flow_events_priv.back().flow, expr)))
-                        break;
+                    try {
+                        if ((match = flow_parser.Parse(
+                               flow_events_priv.back().flow, expr)))
+                            break;
+                    } catch (string &e) {
+                        nd_dprintf("%s: %s: %s\n",
+                            tag.c_str(), expr.c_str(), e.c_str());
+                    }
                 }
 
                 if (! match) {

@@ -6,7 +6,7 @@ m4_include([m4/ax_git_vars.m4])
 m4_include([m4/ax_check_progs.m4])
 
 AC_PREREQ([2.69])
-AC_INIT([Netify Core Processor Plugin], [1.0.25],
+AC_INIT([Netify Core Processor Plugin], [1.0.26],
     [https://gitlab.com/netify.ai/public/netify-plugins/netify-proc-core/issues],
     [netify-proc-core],[http://www.netify.ai/])
 AM_INIT_AUTOMAKE([1.9 tar-pax])
@@ -59,9 +59,9 @@ AC_SUBST([GIT_SOURCE_URL], [https://gitlab.com/netify.ai/public/netify-plugins/n
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([deploy/Makefile \
-		 deploy/plugins.d/Makefile deploy/openwrt/Makefile \
-		 deploy/debian/Makefile deploy/rpm/Makefile \
-		 deploy/freebsd/Makefile deploy/freebsd/pkg-plist])
+    deploy/plugins.d/Makefile deploy/openwrt/Makefile \
+    deploy/debian/Makefile deploy/rpm/Makefile \
+    deploy/freebsd/Makefile deploy/freebsd/pkg-plist])
 AC_OUTPUT
 
 AS_BOX([${PACKAGE_NAME} v${PACKAGE_VERSION}])
