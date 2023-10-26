@@ -19,7 +19,7 @@ include:
       - /gitlab/common/variants-templates.yml
 
 variables:
-  NETIFY_MINVER: "5.0.4-1"
+  NETIFY_MINVER: "5.0.4"
   NETIFY_VERREL:
     value: ${NETIFY_MINVER}-1
     expand: true
