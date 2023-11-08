@@ -273,9 +273,10 @@ void nppPlugin::DispatchProcessorEvent(
     nd_dprintf("%s: %s\n", tag.c_str(), __PRETTY_FUNCTION__);
 #endif
     switch (event) {
-    case ndPluginProcessor::EVENT_FLOW_NEW:
-    case ndPluginProcessor::EVENT_FLOW_UPDATED:
-    case ndPluginProcessor::EVENT_FLOW_EXPIRED: break;
+    case ndPluginProcessor::EVENT_DPI_NEW:
+    case ndPluginProcessor::EVENT_DPI_UPDATE:
+    case ndPluginProcessor::EVENT_DPI_COMPLETE:
+    case ndPluginProcessor::EVENT_FLOW_EXPIRE: break;
     default: return;
     }
 
@@ -481,11 +482,13 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event, json &jpayload) {
         encode_options |= ndFlow::ENCODE_STATS;
         encode_options |= ndFlow::ENCODE_TUNNELS;
         break;
-    case ndPluginProcessor::EVENT_FLOW_NEW:
-    case ndPluginProcessor::EVENT_FLOW_UPDATED:
+    case ndPluginProcessor::EVENT_DPI_UPDATE:
+        encode_options |= ndFlow::ENCODE_STATS;
+    case ndPluginProcessor::EVENT_DPI_NEW:
         encode_options |= ndFlow::ENCODE_TUNNELS;
         break;
-    case ndPluginProcessor::EVENT_FLOW_EXPIRED:
+    case ndPluginProcessor::EVENT_DPI_COMPLETE:
+    case ndPluginProcessor::EVENT_FLOW_EXPIRE:
         encode_options = ndFlow::ENCODE_STATS;
         break;
     default: return;
@@ -503,16 +506,21 @@ void nppPlugin::EncodeFlow(const nppFlowEvent &event, json &jpayload) {
     }
 
     switch (event.event) {
-    case ndPluginProcessor::EVENT_FLOW_NEW:
-    case ndPluginProcessor::EVENT_FLOW_UPDATED:
+    case ndPluginProcessor::EVENT_DPI_NEW:
         jpayload["type"] = "flow";
+        break;
+    case ndPluginProcessor::EVENT_DPI_UPDATE:
+        jpayload["type"] = "flow_dpi_update";
+        break;
+    case ndPluginProcessor::EVENT_DPI_COMPLETE:
+        jpayload["type"] = "flow_dpi_complete";
         break;
     case ndPluginProcessor::EVENT_FLOW_MAP:
         jpayload["type"] = "flow_stats";
         jflow.clear();
         event.flow->Encode(jflow, event.stats, ndFlow::ENCODE_STATS);
         break;
-    case ndPluginProcessor::EVENT_FLOW_EXPIRED:
+    case ndPluginProcessor::EVENT_FLOW_EXPIRE:
         jpayload["type"] = "flow_purge";
         jpayload["reason"] =
           (event.flow->ip_protocol == IPPROTO_TCP &&

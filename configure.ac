@@ -18,7 +18,7 @@ AC_CANONICAL_HOST
 
 # Set the minimum Agent version this plugin requires.
 # When updating this version, remember to update .gitlab-ci.yml too.
-NETIFY_MINVER=5.0.5
+NETIFY_MINVER=5.0.6
 AC_SUBST([NETIFY_MINVER], [$NETIFY_MINVER])
 
 # Checks for programs.
